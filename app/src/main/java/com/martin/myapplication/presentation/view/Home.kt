@@ -74,6 +74,12 @@ var topMovies: MutableList<RowItem> = mutableListOf(
     RowItem.Movie1,
     RowItem.Movie2,
     RowItem.Movie3,
+    RowItem.Movie3,
+    RowItem.Movie3,
+    RowItem.Movie3,
+    RowItem.Movie3,
+    RowItem.Movie3,
+    RowItem.Movie3,
 )
 
 @Composable
@@ -85,7 +91,7 @@ fun TopRatedMovies() {
             color = Color.White,
             fontSize = 20.sp,
             fontFamily = poppins,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.ExtraBold,
         )
         Box {
             LazyRow(horizontalArrangement = Arrangement.spacedBy((-20).dp)) {
@@ -181,21 +187,18 @@ fun MovieCategories() {
     }
     LazyVerticalGrid(
         horizontalArrangement = Arrangement.SpaceBetween,
-        columns = GridCells.Adaptive(minSize = 85.dp),
+        columns = GridCells.Adaptive(minSize = 110.dp),
         modifier = Modifier.padding(end = 24.dp)
     ) {
         items(topMovies) { movie ->
-                Image(
-                    painter = painterResource(id = movie.photo),
-                    contentDescription = "Movie poster",
-                    modifier = Modifier
-                        .padding(top = 24.dp)
-                        .size(height = 145.dp, width = 100.dp)
-                )
-
-
+            Image(
+                painter = painterResource(id = movie.photo),
+                contentDescription = "Movie poster",
+                modifier = Modifier
+                    .padding(top = 24.dp)
+                    .size(height = 160.dp, width = 110.dp)
+            )
         }
-
     }
 }
 
