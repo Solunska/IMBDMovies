@@ -15,9 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.IconButton
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Scaffold
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.TextField
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -144,7 +149,6 @@ fun SearchBar(innerPadding: PaddingValues) {
         label = {
             Text(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
                     .padding(start = 20.dp),
                 text = "Search", color = Color(0xFF67686D)
             )
@@ -176,7 +180,7 @@ fun SearchContent() {
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 24.dp, vertical = 12.dp)
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         items(movies) { movie ->
             MovieCard(movieItem = movie)
@@ -188,32 +192,34 @@ fun SearchContent() {
 fun MovieCard(movieItem: ColItem) {
     Row(
         modifier = Modifier
-            .padding(12.dp)
+            .padding(8.dp)
             .fillMaxSize()
     ) {
         Image(
             modifier = Modifier
-                .height(130.dp)
-                .width(90.dp),
+                .height(150.dp)
+                .width(100.dp),
             painter = painterResource(id = movieItem.photo),
             contentDescription = "movie photo"
         )
         Column(
             modifier = Modifier
+                .height(150.dp)
                 .padding(start = 12.dp, top = 4.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = movieItem.name,
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.White,
                 fontFamily = poppins
             )
             Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 4.dp),
+                verticalArrangement = Arrangement.Bottom,
             ) {
                 IconWithText(
                     icon = R.drawable.star,
@@ -232,7 +238,7 @@ fun MovieCard(movieItem: ColItem) {
                 )
                 IconWithText(
                     icon = R.drawable.clock,
-                    text = movieItem.duration.toString(),
+                    text = "${movieItem.duration} minutes",
                     "FFFFFF"
                 )
             }
@@ -243,17 +249,23 @@ fun MovieCard(movieItem: ColItem) {
 @Composable
 fun IconWithText(icon: Int, text: String, color: String) {
 
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.padding(top = 4.dp).height(22.dp)
+    ) {
         Icon(
+            modifier = Modifier.height(22.dp),
             painter = painterResource(icon),
             contentDescription = "sda",
             tint = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White
         )
         Text(
+            modifier = Modifier.height(24.dp),
             text = text,
             fontFamily = poppins,
             color = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White,
-            fontSize = 12.sp
+            fontSize = 14.sp,
         )
     }
 }
