@@ -44,33 +44,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    var pageItems by remember { mutableStateOf(listOf("Page 1", "Page 2", "Page 3")) }
-    val pagerState = rememberPagerState(pageCount = { pageItems.size + 1 })
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f)
-        ) { page ->
-            if (page < pageItems.size) {
-                BasicText(
-                    text = pageItems[page],
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxSize()
-                )
-            } else {
-                BasicText(
-                    text = "This is the additional last page.",
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxSize()
-                )
-            }
-        }
-    }
-}

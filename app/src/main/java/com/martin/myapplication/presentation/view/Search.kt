@@ -2,6 +2,7 @@ package com.martin.myapplication.presentation.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -50,7 +51,6 @@ import androidx.navigation.NavHostController as NavHostController1
 
 @Composable
 fun Search(navController: NavHostController1) {
-
     SearchPage()
 }
 
@@ -160,7 +160,9 @@ fun SearchBar(innerPadding: PaddingValues) {
         singleLine = true,
         shape = RoundedCornerShape(20.dp),
         trailingIcon = {
-            IconButton(modifier = Modifier.padding(end = 10.dp), onClick = { /*TODO*/ }) {
+            IconButton(
+                modifier = Modifier.padding(end = 10.dp),
+                onClick = { /*TODO*/ }) {
                 Icon(
                     painter = painterResource(R.drawable.search_icon_only),
                     contentDescription = "sda",
@@ -201,7 +203,7 @@ fun MovieCard(movieItem: ColItem) {
         Image(
             modifier = Modifier
                 .height(150.dp)
-                .width(100.dp),
+                .width(106.dp),
             painter = painterResource(id = movieItem.photo),
             contentDescription = "movie photo"
         )
@@ -214,7 +216,7 @@ fun MovieCard(movieItem: ColItem) {
             Text(
                 text = movieItem.name,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Medium,
                 color = Color.White,
                 fontFamily = poppins
             )
@@ -260,18 +262,21 @@ fun IconWithText(icon: Int, text: String, color: String) {
             .height(22.dp)
     ) {
         Icon(
-            modifier = Modifier.height(22.dp),
+            modifier = Modifier.height(24.dp),
             painter = painterResource(icon),
             contentDescription = "sda",
             tint = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White
         )
-        Text(
-            modifier = Modifier.height(24.dp),
-            text = text,
-            fontFamily = poppins,
-            color = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White,
-            fontSize = 14.sp,
-        )
+        Box(modifier = Modifier.height(24.dp), contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                fontFamily = poppins,
+                color = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Justify,
+                fontWeight = if (icon == R.drawable.star) FontWeight.Bold else FontWeight.Normal
+            )
+        }
     }
 }
 

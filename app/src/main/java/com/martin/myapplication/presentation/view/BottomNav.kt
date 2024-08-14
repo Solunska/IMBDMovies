@@ -91,7 +91,10 @@ fun BottomNav() {
             composable(BottomNavItem.Home.route) {
                 Home(
                     navController,
-                    Modifier.background(color = Color(0xFF242A32)).fillMaxHeight())
+                    Modifier
+                        .background(color = Color(0xFF242A32))
+                        .fillMaxHeight()
+                )
             }
             composable(BottomNavItem.Search.route) { Search(navController) }
             composable(BottomNavItem.Saved.route) { Saved(navController) }
