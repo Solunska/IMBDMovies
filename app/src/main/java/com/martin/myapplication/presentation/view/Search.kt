@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -142,15 +143,17 @@ fun SearchBar(innerPadding: PaddingValues) {
 
     TextField(
         modifier = Modifier
-            .height(48.dp)
+            .height(53.dp)
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
         value = searchInput,
-        label = {
+        placeholder = {
             Text(
                 modifier = Modifier
-                    .padding(start = 20.dp),
-                text = "Search", color = Color(0xFF67686D)
+                    .padding(start = 5.dp),
+                text = "Search",
+                color = Color(0xFF67686D),
+                fontSize = 16.sp,
             )
         },
         onValueChange = { searchInput = it },
@@ -252,7 +255,9 @@ fun IconWithText(icon: Int, text: String, color: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.padding(top = 4.dp).height(22.dp)
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .height(22.dp)
     ) {
         Icon(
             modifier = Modifier.height(22.dp),
