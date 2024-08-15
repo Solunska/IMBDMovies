@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -91,6 +92,11 @@ var movie = Movie(
         )
     ),
     cast = mutableListOf("Tom Holland", "Zendaya", "Benedict Cumberbatch", "Brad Pitt")
+)
+
+val colorStops = arrayOf(
+    0.0f to Color(37, 40, 54),
+    1.0f to Color(0xFF43474E)
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -169,7 +175,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                 Box(
                     modifier = Modifier
                         .padding(bottom = 25.dp, end = 20.dp)
-                        .width(54.dp)
+                        .width(56.dp)
                         .height(26.dp)
                         .clip(RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.Center,
@@ -178,7 +184,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                         modifier = Modifier
                             .height(40.dp)
                             .fillMaxHeight()
-                            .background(Color(0xFF252836))
+                            .background(Brush.horizontalGradient(colorStops = colorStops))
                             .clip(RoundedCornerShape(20.dp)),
                         contentAlignment = Alignment.Center
                     ) {
