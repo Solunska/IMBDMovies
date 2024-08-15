@@ -227,24 +227,30 @@ fun MovieCard(movieItem: ColItem) {
                 verticalArrangement = Arrangement.Bottom,
             ) {
                 IconWithText(
+                    modifier = Modifier,
                     icon = R.drawable.star,
                     text = movieItem.rating.toString(),
-                    "#FF8700"
+                    details = false
                 )
                 IconWithText(
+                    modifier = Modifier,
                     icon = R.drawable.ticket,
                     text = movieItem.genre,
-                    "FFFFFF"
+                    details = false
+
                 )
                 IconWithText(
+                    modifier = Modifier,
                     icon = R.drawable.calendarblank,
                     text = movieItem.year.toString(),
-                    "FFFFFF"
+                    details = false
+
                 )
                 IconWithText(
+                    modifier = Modifier,
                     icon = R.drawable.clock,
                     text = "${movieItem.duration} minutes",
-                    "FFFFFF"
+                    details = false
                 )
             }
         }
@@ -252,7 +258,7 @@ fun MovieCard(movieItem: ColItem) {
 }
 
 @Composable
-fun IconWithText(icon: Int, text: String, color: String) {
+fun IconWithText(modifier: Modifier, icon: Int, text: String, details: Boolean) {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -265,16 +271,18 @@ fun IconWithText(icon: Int, text: String, color: String) {
             modifier = Modifier.height(24.dp),
             painter = painterResource(icon),
             contentDescription = "sda",
-            tint = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White
+            tint = if (details) Color(0xFF92929D) else if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White
         )
         Box(modifier = Modifier.height(24.dp), contentAlignment = Alignment.Center) {
             Text(
                 text = text,
                 fontFamily = poppins,
-                color = if (icon == R.drawable.star) Color(0xFFFF8700) else Color.White,
+                color = if (details) Color(0xFF92929D) else if (icon == R.drawable.star) Color(
+                    0xFFFF8700
+                ) else Color.White,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Justify,
-                fontWeight = if (icon == R.drawable.star) FontWeight.Bold else FontWeight.Normal
+                fontWeight = if (details) FontWeight.Medium else if (icon == R.drawable.star) FontWeight.Bold else FontWeight.Normal
             )
         }
     }

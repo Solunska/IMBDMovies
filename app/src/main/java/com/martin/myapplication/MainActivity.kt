@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.martin.myapplication.presentation.ui.theme.MyApplicationTheme
 import com.martin.myapplication.presentation.view.BottomNav
+import com.martin.myapplication.presentation.view.MovieDetails
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
                         .fillMaxHeight()
                         .background(color = Color(0xFF242A32)),
                 ) {
-                    BottomNav()
+                    MovieDetails()
                 }
             }
         }
