@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Scaffold
@@ -40,6 +42,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,13 +68,18 @@ class Movie(
     val genre: String,
     val description: String,
     val reviews: MutableList<Review>,
-    val cast: MutableList<String>
+    val cast: MutableList<Cast>
 )
 
 class Review(
     val name: String,
     val reviewContent: String,
     val reviewStars: Double
+)
+
+class Cast(
+    val name: String,
+    val image: Int
 )
 
 var movie = Movie(
@@ -99,8 +107,13 @@ var movie = Movie(
             6.3
         )
     ),
-    cast = mutableListOf("Tom Holland", "Zendaya", "Benedict Cumberbatch", "Brad Pitt")
+    cast = mutableListOf(
+        Cast("Tom Holland", R.drawable.tom_holand),
+        Cast("Tom Holland", R.drawable.tom_holand),
+        Cast("Tom Holland", R.drawable.tom_holand),
+    )
 )
+
 
 val colorStops = arrayOf(
     0.0f to Color(37, 40, 54),
@@ -279,8 +292,8 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                 }
                 IconWithText(
                     modifier = Modifier.height(20.dp),
-                    icon = R.drawable.calendarblank,
-                    text = movie.year.toString(),
+                    icon = R.drawable.clock,
+                    text = movie.duration.toString(),
                     details = true
                 )
                 Box(
@@ -291,8 +304,8 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                 }
                 IconWithText(
                     modifier = Modifier.height(20.dp),
-                    icon = R.drawable.calendarblank,
-                    text = movie.year.toString(),
+                    icon = R.drawable.ticket,
+                    text = movie.genre,
                     details = true
                 )
             }
@@ -326,7 +339,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontFamily = poppins,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = if (activeTab == "Reviews") FontWeight.Bold else FontWeight.Medium,
                         color = Color.White
                     ),
                 )
@@ -338,7 +351,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontFamily = poppins,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = if (activeTab == "Cast") FontWeight.Bold else FontWeight.Medium,
                         color = Color.White
                     ),
                 )
@@ -348,26 +361,87 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
         if (activeTab == "About") {
             AboutContent()
         } else if (activeTab == "Reviews") {
-            ReviewsContent()
+            LazyColumn(
+                modifier = Modifier.padding(start = 30.dp, end = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(movie.reviews) { review ->
+                    ReviewsContent(
+                        name = review.name,
+                        rating = review.reviewStars,
+                        review = review.reviewContent
+                    )
+                }
+            }
         } else
-            CastContent()
+            LazyColumn(modifier = Modifier.padding(horizontal = 30.dp)) {
+                items(movie.cast) { cast ->
+                    CastContent(name = cast.name, photo = cast.image)
+                }
+            }
 
     }
 }
 
 @Composable
 fun AboutContent() {
-    Text(text = "About")
+    Text(
+        modifier = Modifier.padding(horizontal = 30.dp),
+        text = movie.description,
+        fontFamily = poppins,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Normal,
+        color = Color.White,
+        lineHeight = 18.sp
+    )
 }
 
 @Composable
-fun ReviewsContent() {
-    Text(text = "Reviews")
+fun ReviewsContent(name: String, rating: Double, review: String) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Image(
+                modifier = Modifier
+                    .height(44.dp)
+                    .width(44.dp),
+                painter = painterResource(id = R.drawable.profile_photo),
+                contentDescription = "Profile Photo"
+            )
+            Text(
+                modifier = Modifier.width(44.dp),
+                text = rating.toString(),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF0296E5),
+                fontWeight = FontWeight.Medium
+            )
+
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = name,
+                color = Color.White,
+                fontWeight = FontWeight.Medium,
+                fontFamily = poppins,
+                fontSize = 12.sp
+            )
+            Text(
+                text = review,
+                color = Color.White,
+                fontWeight = FontWeight.Normal,
+                fontFamily = poppins,
+                fontSize = 12.sp,
+                lineHeight = 18.sp
+            )
+        }
+    }
 }
 
 @Composable
-fun CastContent() {
-    Text(text = "Cast")
+fun CastContent(name: String, photo: Int) {
+    Column {
+        Image(painter = painterResource(id = photo), contentDescription = "Actor Image")
+        Text(text = name)
+    }
 }
 
 @Preview

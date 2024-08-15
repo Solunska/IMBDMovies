@@ -1,5 +1,6 @@
 package com.martin.myapplication
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,9 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.martin.myapplication.presentation.ui.theme.MyApplicationTheme
 import com.martin.myapplication.presentation.view.BottomNav
+import com.martin.myapplication.presentation.view.HomePage
 import com.martin.myapplication.presentation.view.MovieDetails
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,7 +42,9 @@ class MainActivity : ComponentActivity() {
                         .fillMaxHeight()
                         .background(color = Color(0xFF242A32)),
                 ) {
-                    MovieDetails()
+                    Scaffold(bottomBar = { BottomNav() }) {
+                        HomePage(modifier = Modifier)
+                    }
                 }
             }
         }
