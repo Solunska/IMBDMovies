@@ -83,6 +83,9 @@ var movies: MutableList<ColItem> = mutableListOf(
 @Composable
 fun SearchResults() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val hasResults by remember {
+        mutableStateOf(true)
+    }
 
     Scaffold(
         backgroundColor = Color(0xFF242A32),
@@ -130,7 +133,10 @@ fun SearchResults() {
                 .fillMaxWidth()
         ) {
             SearchBar(innerPadding)
-            SearchContent()
+            if (hasResults)
+                SearchContent()
+            else
+                NoResultsPage()
         }
     }
 }
@@ -285,6 +291,45 @@ fun IconWithText(modifier: Modifier, icon: Int, text: String, details: Boolean) 
                 fontWeight = if (details) FontWeight.Medium else if (icon == R.drawable.star) FontWeight.Bold else FontWeight.Normal
             )
         }
+    }
+}
+
+@Composable
+fun NoResultsPage() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            modifier = Modifier
+                .size(85.dp)
+                .padding(bottom = 16.dp),
+            painter = painterResource(id = R.drawable.search_image),
+            contentDescription = "No search results image"
+        )
+        Text(
+            text = "We Are Sorry, We Can Not Find The Movie :(",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            lineHeight = 25.6.sp,
+            letterSpacing = 0.12.sp,
+            fontFamily = poppins,
+            modifier = Modifier
+                .width(188.dp)
+                .padding(bottom = 8.dp),
+        )
+        Text(
+            text = "Find your movie by Type title, categories, years, etc ",
+            fontFamily = poppins,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF92929D),
+            modifier = Modifier.width(200.dp),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

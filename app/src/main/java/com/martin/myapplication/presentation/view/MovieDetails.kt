@@ -1,7 +1,9 @@
 package com.martin.myapplication.presentation.view
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -176,10 +182,11 @@ fun Details() {
 
 }
 
+@SuppressLint("InvalidColorHexValue")
 @Composable
 fun MovieDetailsContent(innerPadding: PaddingValues) {
     var activeTab by remember {
-        mutableStateOf("About")
+        mutableStateOf("Cast")
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -232,7 +239,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                                 Text(
                                     text = movie.rating.toString(),
                                     color = Color(0xFFFF8700),
-                                    fontSize = 12.sp,
+                                    fontSize = 12.5.sp,
                                     fontFamily = poppins,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -319,42 +326,77 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                ClickableText(
-                    onClick = {
-                        activeTab = "About"
-                    },
-                    text = AnnotatedString("About Movie"),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontFamily = poppins,
-                        fontWeight = if (activeTab == "About") FontWeight.Bold else FontWeight.Medium,
-                        color = Color.White
-                    ),
-                )
-                ClickableText(
-                    onClick = {
-                        activeTab = "Reviews"
-                    },
-                    text = AnnotatedString("Reviews"),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontFamily = poppins,
-                        fontWeight = if (activeTab == "Reviews") FontWeight.Bold else FontWeight.Medium,
-                        color = Color.White
-                    ),
-                )
-                ClickableText(
-                    onClick = {
-                        activeTab = "Cast"
-                    },
-                    text = AnnotatedString("Cast"),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontFamily = poppins,
-                        fontWeight = if (activeTab == "Cast") FontWeight.Bold else FontWeight.Medium,
-                        color = Color.White
-                    ),
-                )
+                Box(
+                    modifier = if (activeTab == "About") Modifier
+                        .background(Color(0xFF3A3F47))
+                        .height(30.dp)
+                    else Modifier
+                ) {
+                    ClickableText(
+                        modifier = Modifier
+                            .background(Color(0xFF242A32))
+                            .padding(bottom = 4.dp)
+                            .width(110.dp),
+                        onClick = {
+                            activeTab = "About"
+                        },
+                        text = AnnotatedString("About Movie"),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontFamily = poppins,
+                            fontWeight = if (activeTab == "About") FontWeight.Bold else FontWeight.Medium,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                    )
+                }
+                Box(
+                    modifier = if (activeTab == "Reviews") Modifier
+                        .background(Color(0xFF3A3F47))
+                        .height(30.dp)
+                    else Modifier
+                ) {
+                    ClickableText(
+                        modifier = Modifier
+                            .background(Color(0xFF242A32))
+                            .width(75.dp)
+                            .padding(bottom = 4.dp),
+                        onClick = {
+                            activeTab = "Reviews"
+                        },
+                        text = AnnotatedString("Reviews"),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontFamily = poppins,
+                            fontWeight = if (activeTab == "Reviews") FontWeight.Bold else FontWeight.Medium,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                    )
+                }
+                Box(
+                    modifier = if (activeTab == "Cast") Modifier
+                        .background(Color(0xFF3A3F47))
+                        .height(30.dp) else Modifier
+                ) {
+                    ClickableText(
+                        modifier = Modifier
+                            .background(Color(0xFF242A32))
+                            .width(50.dp)
+                            .padding(bottom = 4.dp),
+                        onClick = {
+                            activeTab = "Cast"
+                        },
+                        text = AnnotatedString("Cast"),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontFamily = poppins,
+                            fontWeight = if (activeTab == "Cast") FontWeight.Bold else FontWeight.Medium,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                    )
+                }
             }
         }
 
@@ -362,7 +404,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
             AboutContent()
         } else if (activeTab == "Reviews") {
             LazyColumn(
-                modifier = Modifier.padding(start = 30.dp, end = 24.dp),
+                modifier = Modifier.padding(start = 30.dp, end = 24.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(movie.reviews) { review ->
@@ -374,27 +416,29 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                 }
             }
         } else
-            LazyColumn(modifier = Modifier.padding(horizontal = 30.dp)) {
+            LazyVerticalGrid(
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                 columns = GridCells.Adaptive(minSize = 140.dp) ) {
                 items(movie.cast) { cast ->
                     CastContent(name = cast.name, photo = cast.image)
                 }
             }
-
     }
 }
 
 @Composable
 fun AboutContent() {
     Text(
-        modifier = Modifier.padding(horizontal = 30.dp),
+        modifier = Modifier.padding(start = 30.dp, end = 40.dp),
         text = movie.description,
         fontFamily = poppins,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.SemiBold,
         color = Color.White,
         lineHeight = 18.sp
     )
 }
+
 
 @Composable
 fun ReviewsContent(name: String, rating: Double, review: String) {
@@ -420,14 +464,14 @@ fun ReviewsContent(name: String, rating: Double, review: String) {
             Text(
                 text = name,
                 color = Color.White,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Bold,
                 fontFamily = poppins,
                 fontSize = 12.sp
             )
             Text(
                 text = review,
                 color = Color.White,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Medium,
                 fontFamily = poppins,
                 fontSize = 12.sp,
                 lineHeight = 18.sp
@@ -438,9 +482,24 @@ fun ReviewsContent(name: String, rating: Double, review: String) {
 
 @Composable
 fun CastContent(name: String, photo: Int) {
-    Column {
-        Image(painter = painterResource(id = photo), contentDescription = "Actor Image")
-        Text(text = name)
+    Column(
+        modifier = Modifier.width(100.dp).padding(horizontal = 10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            modifier = Modifier.size(120.dp),
+            painter = painterResource(id = photo),
+            contentDescription = "Actor Image"
+        )
+        Text(
+            modifier = Modifier.width(100.dp),
+            text = name,
+            textAlign = TextAlign.Center,
+            fontFamily = poppins,
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 
