@@ -186,7 +186,7 @@ fun Details() {
 @Composable
 fun MovieDetailsContent(innerPadding: PaddingValues) {
     var activeTab by remember {
-        mutableStateOf("Cast")
+        mutableStateOf("About")
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
