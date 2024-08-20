@@ -29,7 +29,9 @@ import com.martin.myapplication.presentation.ui.theme.MyApplicationTheme
 import com.martin.myapplication.presentation.view.BottomNav
 import com.martin.myapplication.presentation.view.HomePage
 import com.martin.myapplication.presentation.view.MovieDetails
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
