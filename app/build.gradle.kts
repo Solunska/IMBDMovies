@@ -34,6 +34,18 @@ android {
             "IMAGE_BASE_URL",
             project.findProperty("image_base_url") as String
         )
+        buildConfigField(
+            "String",
+            "MOVIES_ACCESS_TOKEN",
+            project.findProperty("movies_access_token") as String
+        )
+
+        buildConfigField(
+            "String",
+            "MOVIES_API_KEY",
+            project.findProperty("movies_api_key") as String
+        )
+
         buildFeatures {
             compose = true
         }

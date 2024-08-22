@@ -10,7 +10,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import javax.inject.Singleton
@@ -23,8 +25,10 @@ object AppModule {
 
     // OkHttpClient handles HTTP requests and responses, and gives deep logs for debugging if in debug mode
     @Provides
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         val builder = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(provideHeaderInterceptor())
 
         if (BuildConfig.DEBUG) {
             val interceptor = HttpLoggingInterceptor()
@@ -33,6 +37,20 @@ object AppModule {
         }
 
         return builder.build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHeaderInterceptor(): Interceptor {
+        return Interceptor { chain ->
+            val original = chain.request()
+            val requestBuilder = original.newBuilder()
+                .addHeader("accept", "application/json")
+                .addHeader("content-type", "application/json")
+                .addHeader("Authorization", "Bearer ${BuildConfig.MOVIES_API_KEY}")
+            val request = requestBuilder.build()
+            chain.proceed(request)
+        }
     }
 
     // Moshi is used for JSON parsing into kotlin objects
