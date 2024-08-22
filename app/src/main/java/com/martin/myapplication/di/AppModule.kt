@@ -23,18 +23,22 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+
+    @Provides
+    @Singleton
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+    }
+
     // OkHttpClient handles HTTP requests and responses, and gives deep logs for debugging if in debug mode
     @Provides
+    @Singleton
     fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(provideHeaderInterceptor())
-
-        if (BuildConfig.DEBUG) {
-            val interceptor = HttpLoggingInterceptor()
-            interceptor.level = HttpLoggingInterceptor.Level.BODY
-            builder.addInterceptor(interceptor)
-        }
 
         return builder.build()
     }
@@ -47,7 +51,7 @@ object AppModule {
             val requestBuilder = original.newBuilder()
                 .addHeader("accept", "application/json")
                 .addHeader("content-type", "application/json")
-                .addHeader("Authorization", "Bearer ${BuildConfig.MOVIES_API_KEY}")
+                .addHeader("Authorization", "Bearer ${BuildConfig.MOVIES_ACCESS_TOKEN}")
             val request = requestBuilder.build()
             chain.proceed(request)
         }

@@ -7,10 +7,10 @@ import com.martin.myapplication.data.remote.model.TopRatedMoviesError
 import com.slack.eithernet.ApiResult
 import javax.inject.Inject
 
-class GetTopRatedMoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
+class TopRatedMoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
 
     suspend fun getTopRatedMovies(): ApiResult<TopMoviesResponse, TopRatedMoviesError> {
-        val result = moviesApi.getPopularMovies(BuildConfig.MOVIES_API_KEY)
+        val result = moviesApi.getPopularMovies()
 
         when (result) {
             is ApiResult.Success -> {
@@ -24,4 +24,5 @@ class GetTopRatedMoviesRepository @Inject constructor(private val moviesApi: Mov
         }
         return result
     }
+
 }

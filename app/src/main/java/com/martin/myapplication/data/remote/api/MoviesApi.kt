@@ -10,7 +10,6 @@ interface MoviesApi {
 
     @GET("movie/top_rated")
     suspend fun getPopularMovies(
-        @Query("api_key") apiKey: String,
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
     ): ApiResult<TopMoviesResponse, TopRatedMoviesError>

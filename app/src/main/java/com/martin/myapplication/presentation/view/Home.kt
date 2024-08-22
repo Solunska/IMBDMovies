@@ -24,6 +24,8 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
@@ -36,19 +38,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.martin.myapplication.R
 import com.martin.myapplication.presentation.ui.theme.montserrat
 import com.martin.myapplication.presentation.ui.theme.poppins
+import com.martin.myapplication.presentation.viewmodel.MovieViewModel
 
 
 @Composable
-fun Home(navController: NavController, modifier: Modifier) {
+fun Home(
+    navController: NavController,
+    modifier: Modifier,
+) {
+
+    var movieViewModel : MovieViewModel  = viewModel()
     HomePage(Modifier.padding(top = 42.dp))
 }
 
 @Composable
 fun HomePage(modifier: Modifier) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
