@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.martin.myapplication.R
@@ -45,19 +46,19 @@ import com.martin.myapplication.presentation.ui.theme.montserrat
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieViewModel
 
+//
+//@Composable
+//fun Home(
+//    modifier: Modifier,
+//) {
+//
+//    HomePage(Modifier.padding(top = 42.dp))
+//}
 
 @Composable
-fun Home(
-    navController: NavController,
-    modifier: Modifier,
-) {
-
-    var movieViewModel : MovieViewModel  = viewModel()
-    HomePage(Modifier.padding(top = 42.dp))
-}
-
-@Composable
-fun HomePage(modifier: Modifier) {
+fun HomePage() {
+    val movieViewModel = hiltViewModel<MovieViewModel>()
+    val state by movieViewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
@@ -215,5 +216,5 @@ fun MovieCategories() {
 @Preview
 @Composable
 fun HomePreview() {
-    HomePage(Modifier)
+    HomePage()
 }

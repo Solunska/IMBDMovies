@@ -38,15 +38,9 @@ import com.martin.myapplication.R
 import com.martin.myapplication.presentation.ui.theme.poppins
 
 @Composable
-fun Saved(navController: NavHostController) {
-    SavedMoviesPage()
-}
-
-@Composable
 fun SavedMoviesPage() {
     SavedMovies()
 }
-
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)

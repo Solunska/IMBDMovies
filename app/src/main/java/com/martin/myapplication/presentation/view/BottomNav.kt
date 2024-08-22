@@ -37,9 +37,8 @@ val items: List<BottomNavItem> = listOf(
     BottomNavItem.Saved
 )
 
-
 @Composable
-fun BottomNav() {
+fun MainPage() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
@@ -89,15 +88,14 @@ fun BottomNav() {
             Modifier.padding(innerPadding)
         ) {
             composable(BottomNavItem.Home.route) {
-                Home(
-                    navController,
-                    Modifier
-                        .background(color = Color(0xFF242A32))
-                        .fillMaxHeight()
+                HomePage(
+//                    Modifier
+//                        .background(color = Color(0xFF242A32))
+//                        .fillMaxHeight()
                 )
             }
-            composable(BottomNavItem.Search.route) { Search(navController) }
-            composable(BottomNavItem.Saved.route) { Saved(navController) }
+            composable(BottomNavItem.Search.route) { SearchPage() }
+            composable(BottomNavItem.Saved.route) { SavedMoviesPage() }
         }
 
     }
@@ -105,6 +103,6 @@ fun BottomNav() {
 
 @Preview
 @Composable
-fun BottomNavPreview() {
-    BottomNav()
+fun MainPagePreview() {
+    MainPage()
 }

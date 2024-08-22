@@ -50,11 +50,6 @@ import com.martin.myapplication.presentation.ui.theme.poppins
 import androidx.navigation.NavHostController as NavHostController1
 
 @Composable
-fun Search(navController: NavHostController1) {
-    SearchPage()
-}
-
-@Composable
 fun SearchPage() {
     SearchResults()
 }
