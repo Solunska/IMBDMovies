@@ -1,6 +1,6 @@
-package com.martin.myapplication.data.remote.model
+package com.martin.myapplication.data.remote.dto
 
-data class TopRatedMoviesError(
+data class MoviesError(
     val status_code: Int,
     val status_message: String,
     val success: Boolean

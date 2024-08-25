@@ -1,64 +1,52 @@
 package com.martin.myapplication.presentation.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absoluteOffset
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.domain.model.MovieModel
+import com.martin.myapplication.presentation.state.UIState
 import com.martin.myapplication.presentation.ui.theme.montserrat
 import com.martin.myapplication.presentation.ui.theme.poppins
-import com.martin.myapplication.presentation.viewmodel.MovieViewModel
-
-//
-//@Composable
-//fun Home(
-//    modifier: Modifier,
-//) {
-//
-//    HomePage(Modifier.padding(top = 42.dp))
-//}
+import com.martin.myapplication.presentation.viewmodel.NowPlayingMoviesViewModel
+import com.martin.myapplication.presentation.viewmodel.TopMoviesViewModel
+import com.slack.eithernet.ApiResult
 
 @Composable
 fun HomePage() {
-    val movieViewModel = hiltViewModel<MovieViewModel>()
-    val state by movieViewModel.state.collectAsState()
+    val topMoviesViewModel: TopMoviesViewModel = hiltViewModel()
+    val topMoviesState = topMoviesViewModel.state.value
+
+    val nowPlayingMoviesViewModel: NowPlayingMoviesViewModel = hiltViewModel()
+    val nowPlayingState = nowPlayingMoviesViewModel.state.value
 
     Column(
         modifier = Modifier
@@ -66,35 +54,14 @@ fun HomePage() {
             .background(color = Color(0xFF242A32))
             .padding(start = 24.dp)
     ) {
-        TopRatedMovies()
-        MovieCategories()
+        TopRatedMovies(topMoviesState)
+        MovieCategories(nowPlayingState)
     }
 
 }
 
-sealed class RowItem(val photo: Int, val placement: Int, val category: String) {
-    data object Movie1 : RowItem(R.drawable.movie_1, 1, "Now playing")
-    data object Movie2 : RowItem(R.drawable.movie_2, 2, "Upcoming")
-    data object Movie3 : RowItem(R.drawable.movie_2, 3, "Top rated")
-}
-
-var topMovies: MutableList<RowItem> = mutableListOf(
-    RowItem.Movie1,
-    RowItem.Movie2,
-    RowItem.Movie3,
-    RowItem.Movie1,
-    RowItem.Movie2,
-    RowItem.Movie3,
-    RowItem.Movie3,
-    RowItem.Movie3,
-    RowItem.Movie3,
-    RowItem.Movie3,
-    RowItem.Movie3,
-    RowItem.Movie3,
-)
-
 @Composable
-fun TopRatedMovies() {
+fun TopRatedMovies(state: UIState) {
     Column(Modifier.background(color = Color(0xFF242A32))) {
         Text(
             modifier = Modifier.padding(top = 42.dp, end = 26.dp),
@@ -104,28 +71,29 @@ fun TopRatedMovies() {
             fontFamily = poppins,
             fontWeight = FontWeight.ExtraBold,
         )
-        Box {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy((-20).dp)) {
-                items(topMovies) { movie ->
-                    ShowImage(movieItem = movie)
-                }
 
+        LazyRow(horizontalArrangement = Arrangement.spacedBy((-20).dp)) {
+            itemsIndexed(state.result) { index, movie ->
+                ShowImage(movieItem = movie, placement = index + 1)
             }
         }
+
     }
 }
 
 @Composable
-fun ShowImage(movieItem: RowItem) {
-    Image(
-        painter = painterResource(id = movieItem.photo),
-        contentDescription = "Movie poster",
+fun ShowImage(movieItem: MovieModel.Result, placement: Int) {
+    val imageUrl = IMAGE_BASE_URL + movieItem.posterPath
+
+    AsyncImage(
         modifier = Modifier
             .padding(top = 24.dp)
             .padding(start = 12.dp)
-            .size(height = 210.dp, width = 144.61.dp)
+            .size(height = 210.dp, width = 144.61.dp),
+        model = imageUrl,
+        contentDescription = movieItem.title,
     )
-    OutlinedText(movieItem.placement.toString())
+    OutlinedText(placement.toString())
 }
 
 @Composable
@@ -164,7 +132,6 @@ val outline: TextStyle
                 join = StrokeJoin.Miter,
             )
         )
-
     }
 
 
@@ -176,7 +143,7 @@ var categories: MutableList<String> = mutableListOf(
 )
 
 @Composable
-fun MovieCategories() {
+fun MovieCategories(state: UIState) {
     LazyRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -196,22 +163,27 @@ fun MovieCategories() {
             )
         }
     }
+
     LazyVerticalGrid(
         horizontalArrangement = Arrangement.SpaceBetween,
         columns = GridCells.Adaptive(minSize = 110.dp),
         modifier = Modifier.padding(end = 24.dp)
     ) {
-        items(topMovies) { movie ->
-            Image(
-                painter = painterResource(id = movie.photo),
-                contentDescription = "Movie poster",
+        items(state.result) { movie ->
+
+            val imageUrl = IMAGE_BASE_URL + movie.posterPath
+            AsyncImage(
                 modifier = Modifier
                     .padding(top = 24.dp)
-                    .size(height = 160.dp, width = 110.dp)
+                    .size(height = 160.dp, width = 110.dp),
+                model = imageUrl,
+                contentDescription = movie.title,
             )
         }
     }
+
 }
+
 
 @Preview
 @Composable

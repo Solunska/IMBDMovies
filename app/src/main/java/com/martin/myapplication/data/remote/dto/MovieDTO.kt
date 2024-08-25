@@ -1,23 +1,24 @@
-package com.martin.myapplication.data.remote.model
+package com.martin.myapplication.data.remote.dto
 
 
+import com.martin.myapplication.domain.model.MovieModel
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class TopMoviesResponse(
+data class MovieDTO(
     @Json(name = "page")
     val page: Int,
     @Json(name = "results")
-    val results: List<TopMoviesResult>,
+    val results: List<Result>,
     @Json(name = "total_pages")
     val totalPages: Int,
     @Json(name = "total_results")
-    val totalResults: Int
+    val totalResults: Int,
 ) {
 
     @JsonClass(generateAdapter = true)
-    data class TopMoviesResult(
+    data class Result(
         @Json(name = "adult")
         val adult: Boolean,
         @Json(name = "backdrop_path")
@@ -45,6 +46,22 @@ data class TopMoviesResponse(
         @Json(name = "vote_average")
         val voteAverage: Double,
         @Json(name = "vote_count")
-        val voteCount: Int
+        val voteCount: Int,
     )
 }
+
+//fun MovieDTO.toMovieModel(): MovieModel {
+//    return MovieModel(
+//        results = this.results.map { result ->
+//            MovieModel.Result(
+//                id = result.id,
+//                genreIds = result.genreIds,
+//                title = result.title,
+//                overview = result.overview,
+//                popularity = result.popularity,
+//                posterPath = result.posterPath,
+//                releaseDate = result.releaseDate
+//            )
+//        }
+//    )
+//}
