@@ -3,7 +3,6 @@ package com.martin.myapplication.presentation.view
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +32,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,23 +48,28 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.presentation.state.DetailsUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
+import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
 
 @Composable
-fun MovieDetails() {
-    MovieDetailsPage()
-}
+fun MovieDetailsPage(id: Int) {
+    val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
+    val movieDetailsState = movieDetailsViewModel.state.collectAsState()
 
-@Composable
-fun MovieDetailsPage() {
-    Details()
+    LaunchedEffect(id) {
+        movieDetailsViewModel.fetchMovieDetails(id)
+    }
+
+    Details(movieDetailsState)
 }
 
 class Movie(
@@ -74,18 +81,18 @@ class Movie(
     val genre: String,
     val description: String,
     val reviews: MutableList<Review>,
-    val cast: MutableList<Cast>
+    val cast: MutableList<Cast>,
 )
 
 class Review(
     val name: String,
     val reviewContent: String,
-    val reviewStars: Double
+    val reviewStars: Double,
 )
 
 class Cast(
     val name: String,
-    val image: Int
+    val image: Int,
 )
 
 var movie = Movie(
@@ -128,7 +135,7 @@ val colorStops = arrayOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Details() {
+fun Details(state: State<DetailsUiState>) {
     val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
@@ -174,7 +181,7 @@ fun Details() {
         }
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxWidth()) {
-            MovieDetailsContent(innerPadding)
+            MovieDetailsContent(state, innerPadding)
         }
 
     }
@@ -184,19 +191,22 @@ fun Details() {
 
 @SuppressLint("InvalidColorHexValue")
 @Composable
-fun MovieDetailsContent(innerPadding: PaddingValues) {
+fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValues) {
+
+    val imageUrl = IMAGE_BASE_URL + state.value.movieDetails?.posterPath
+
     var activeTab by remember {
         mutableStateOf("About")
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            Image(
+            AsyncImage(
                 modifier = Modifier
                     .height(250.dp)
                     .fillMaxWidth(),
-                painter = painterResource(id = R.drawable.cover_photo),
-                contentDescription = "Cover Photo"
+                model = imageUrl,
+                contentDescription = state.value.movieDetails?.title,
             )
             Box(
                 modifier = Modifier
@@ -257,15 +267,15 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Image(
+            AsyncImage(
                 modifier = Modifier
                     .height(140.dp)
                     .width(95.dp),
-                painter = painterResource(movie.photo),
-                contentDescription = "Movie Photo"
+                model = imageUrl,
+                contentDescription = state.value.movieDetails?.title,
             )
             Text(
-                text = movie.name,
+                text = state.value.movieDetails?.title.toString(),
                 fontSize = 18.sp,
                 fontFamily = poppins,
                 fontWeight = FontWeight.SemiBold,
@@ -288,7 +298,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                 IconWithText(
                     modifier = Modifier,
                     icon = R.drawable.calendarblank,
-                    text = movie.year.toString(),
+                    text = state.value.movieDetails?.releaseDate.toString(),
                     details = true
                 )
                 Box(
@@ -309,12 +319,14 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                 ) {
                     Text(text = "|", color = Color(0xFF92929D))
                 }
-                IconWithText(
-                    modifier = Modifier.height(20.dp),
-                    icon = R.drawable.ticket,
-                    text = movie.genre,
-                    details = true
-                )
+                state.value.movieDetails?.genres?.get(1)?.name?.let {
+                    IconWithText(
+                        modifier = Modifier.height(20.dp),
+                        icon = R.drawable.ticket,
+                        text = it,
+                        details = true
+                    )
+                }
             }
         }
         Box(
@@ -401,7 +413,7 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
         }
 
         if (activeTab == "About") {
-            AboutContent()
+            AboutContent(state.value.movieDetails?.overview)
         } else if (activeTab == "Reviews") {
             LazyColumn(
                 modifier = Modifier.padding(start = 30.dp, end = 24.dp, bottom = 24.dp),
@@ -415,22 +427,22 @@ fun MovieDetailsContent(innerPadding: PaddingValues) {
                     )
                 }
             }
-        } else
-            LazyVerticalGrid(
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                 columns = GridCells.Adaptive(minSize = 140.dp) ) {
-                items(movie.cast) { cast ->
-                    CastContent(name = cast.name, photo = cast.image)
-                }
+        } else LazyVerticalGrid(
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            columns = GridCells.Adaptive(minSize = 140.dp)
+        ) {
+            items(movie.cast) { cast ->
+                CastContent(name = cast.name, photo = cast.image)
             }
+        }
     }
 }
 
 @Composable
-fun AboutContent() {
+fun AboutContent(overview: String?) {
     Text(
         modifier = Modifier.padding(start = 30.dp, end = 40.dp),
-        text = movie.description,
+        text = overview.toString(),
         fontFamily = poppins,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
@@ -483,7 +495,9 @@ fun ReviewsContent(name: String, rating: Double, review: String) {
 @Composable
 fun CastContent(name: String, photo: Int) {
     Column(
-        modifier = Modifier.width(100.dp).padding(horizontal = 10.dp),
+        modifier = Modifier
+            .width(100.dp)
+            .padding(horizontal = 10.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -502,9 +516,9 @@ fun CastContent(name: String, photo: Int) {
         )
     }
 }
-
-@Preview
-@Composable
-fun AppBarPreview() {
-    Details()
-}
+//
+//@Preview
+//@Composable
+//fun AppBarPreview() {
+//    Details()
+//}

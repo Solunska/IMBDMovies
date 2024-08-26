@@ -1,9 +1,11 @@
 package com.martin.myapplication.data.remote.api
 
 import com.martin.myapplication.data.remote.dto.MovieDTO
+import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
 import com.slack.eithernet.ApiResult
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MoviesApi {
@@ -31,6 +33,13 @@ interface MoviesApi {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
     ): ApiResult<MovieDTO, MoviesError>
+
+    @GET("movie/{movie_id}")
+    suspend fun getMovieDetails(
+        @Path("movie_id") id: Int,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
+    ): ApiResult<MovieDetailsDTO, MoviesError>
 }
 
 

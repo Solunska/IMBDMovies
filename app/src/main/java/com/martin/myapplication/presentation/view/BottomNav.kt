@@ -19,10 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.martin.myapplication.R
 
 sealed class BottomNavItem(val route: String, val icon: Int, val label: String) {
@@ -88,14 +90,19 @@ fun MainPage() {
             Modifier.padding(innerPadding)
         ) {
             composable(BottomNavItem.Home.route) {
-                HomePage(
-//                    Modifier
-//                        .background(color = Color(0xFF242A32))
-//                        .fillMaxHeight()
-                )
+                HomePage(goToDetails = { movieId ->
+                    navController.navigate("movie_details/$movieId")
+                })
             }
             composable(BottomNavItem.Search.route) { SearchPage() }
             composable(BottomNavItem.Saved.route) { SavedMoviesPage() }
+            composable(
+                "movie_details/{movieId}",
+                arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
+                MovieDetailsPage(id = movieId)
+            }
         }
 
     }

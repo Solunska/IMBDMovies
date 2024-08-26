@@ -2,7 +2,7 @@ package com.martin.myapplication.presentation.state
 
 import com.martin.myapplication.domain.model.MovieModel
 
-data class UIState(
+data class HomeUiState(
     val isLoading: Boolean = false,
     val topRatedMovies: List<MovieModel.Result> = emptyList(),
     val nowPlayingMovies: List<MovieModel.Result> = emptyList(),

@@ -1,6 +1,7 @@
 package com.martin.myapplication.presentation.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.domain.model.MovieModel
@@ -41,7 +43,7 @@ import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.HomeScreenViewModel
 
 @Composable
-fun HomePage() {
+fun HomePage(goToDetails: (Int) -> Unit) {
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
     val topMoviesState = homeScreenViewModel.state.collectAsState().value.topRatedMovies
     val nowPlayingState = homeScreenViewModel.state.collectAsState().value.nowPlayingMovies
@@ -71,7 +73,9 @@ fun HomePage() {
             .padding(start = 24.dp)
     ) {
         TopRatedMovies(topMoviesState)
-        MovieCategories(categoryState, movieItems)
+        MovieCategories(categoryState, movieItems) { movieId ->
+            goToDetails(movieId)
+        }
     }
 
 }
@@ -158,7 +162,11 @@ var categories: MutableList<String> = mutableListOf(
 )
 
 @Composable
-fun MovieCategories(categoryState: MutableState<String>, state: List<MovieModel.Result>) {
+fun MovieCategories(
+    categoryState: MutableState<String>,
+    state: List<MovieModel.Result>,
+    onClick: (Int) -> Unit,
+) {
 
     LazyRow(
         horizontalArrangement = Arrangement.SpaceAround,
@@ -191,7 +199,8 @@ fun MovieCategories(categoryState: MutableState<String>, state: List<MovieModel.
             AsyncImage(
                 modifier = Modifier
                     .padding(top = 24.dp)
-                    .size(height = 160.dp, width = 110.dp),
+                    .size(height = 160.dp, width = 110.dp)
+                    .clickable { onClick(movie.id) },
                 model = imageUrl,
                 contentDescription = movie.title,
             )
@@ -200,9 +209,8 @@ fun MovieCategories(categoryState: MutableState<String>, state: List<MovieModel.
 
 }
 
-
 @Preview
 @Composable
 fun HomePreview() {
-    HomePage()
+    HomePage({})
 }

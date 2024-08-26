@@ -2,6 +2,7 @@ package com.martin.myapplication.data.repository
 
 import com.martin.myapplication.data.remote.api.MoviesApi
 import com.martin.myapplication.data.remote.dto.MovieDTO
+import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
 import com.slack.eithernet.ApiResult
 import javax.inject.Inject
@@ -64,6 +65,23 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
             is ApiResult.Success -> {
                 val popularMovies = result.value.results
                 println("Fetched Movies: $popularMovies")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error fetching movies")
+            }
+        }
+
+        return result
+    }
+
+    suspend fun getMovieDetails(id: Int): ApiResult<MovieDetailsDTO, MoviesError> {
+        val result = moviesApi.getMovieDetails(id)
+
+        when (result) {
+            is ApiResult.Success -> {
+                val movieDetails = result.value
+                println("Fetched Movie Details: $movieDetails")
             }
 
             is ApiResult.Failure -> {
