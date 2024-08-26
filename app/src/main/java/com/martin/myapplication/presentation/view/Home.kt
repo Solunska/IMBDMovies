@@ -18,6 +18,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
@@ -31,14 +36,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
-import com.martin.myapplication.R
 import com.martin.myapplication.domain.model.MovieModel
 import com.martin.myapplication.presentation.state.UIState
 import com.martin.myapplication.presentation.ui.theme.montserrat
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.NowPlayingMoviesViewModel
+import com.martin.myapplication.presentation.viewmodel.PopularMoviesViewModel
 import com.martin.myapplication.presentation.viewmodel.TopMoviesViewModel
-import com.slack.eithernet.ApiResult
+import com.martin.myapplication.presentation.viewmodel.UpcomingMoviesViewModel
 
 @Composable
 fun HomePage() {
@@ -48,6 +53,27 @@ fun HomePage() {
     val nowPlayingMoviesViewModel: NowPlayingMoviesViewModel = hiltViewModel()
     val nowPlayingState = nowPlayingMoviesViewModel.state.value
 
+    val upcomingMoviesViewModel: UpcomingMoviesViewModel = hiltViewModel()
+    val upcomingState = upcomingMoviesViewModel.state.value
+
+    val popularMoviesViewModel: PopularMoviesViewModel = hiltViewModel()
+    val popularState = popularMoviesViewModel.state.value
+
+    val categoryState: MutableState<String> = remember {
+        mutableStateOf(value = "Now playing")
+    }
+
+    var movieItems = nowPlayingState
+
+    if (categoryState.value == "Now playing") {
+        movieItems = nowPlayingState
+    } else if (categoryState.value == "Upcoming") {
+        movieItems = upcomingState
+    } else if (categoryState.value == "Popular") {
+        movieItems = popularState
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +81,7 @@ fun HomePage() {
             .padding(start = 24.dp)
     ) {
         TopRatedMovies(topMoviesState)
-        MovieCategories(nowPlayingState)
+        MovieCategories(categoryState, movieItems)
     }
 
 }
@@ -138,25 +164,25 @@ val outline: TextStyle
 var categories: MutableList<String> = mutableListOf(
     "Now playing",
     "Upcoming",
-    "Top rated",
     "Popular"
 )
 
 @Composable
-fun MovieCategories(state: UIState) {
+fun MovieCategories(categoryState: MutableState<String>, state: UIState) {
+
     LazyRow(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier
             .padding(top = 32.dp, end = 24.dp)
             .fillMaxWidth(),
     ) {
         items(categories) { category ->
             ClickableText(
-                onClick = {},
+                onClick = { categoryState.value = category },
                 text = AnnotatedString(category),
                 style = TextStyle(
                     fontFamily = poppins,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = if (categoryState.value == category) FontWeight.ExtraBold else FontWeight.Normal,
                     color = Color.White,
                     fontSize = 14.sp
                 ),

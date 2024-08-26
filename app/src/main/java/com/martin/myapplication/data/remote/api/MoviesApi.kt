@@ -9,7 +9,7 @@ import retrofit2.http.Query
 interface MoviesApi {
 
     @GET("movie/top_rated")
-    suspend fun getPopularMovies(
+    suspend fun getTopRatedMovies(
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
     ): ApiResult<MovieDTO, MoviesError>
@@ -20,7 +20,17 @@ interface MoviesApi {
         @Query("page") page: Int = 1,
     ): ApiResult<MovieDTO, MoviesError>
 
+    @GET("movie/upcoming")
+    suspend fun getUpcomingMovies(
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
+    ): ApiResult<MovieDTO, MoviesError>
 
+    @GET("movie/popular")
+    suspend fun getPopularMovies(
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
+    ): ApiResult<MovieDTO, MoviesError>
 }
 
 

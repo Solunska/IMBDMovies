@@ -9,7 +9,7 @@ import javax.inject.Inject
 class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
 
     suspend fun getTopRatedMovies(): ApiResult<MovieDTO, MoviesError> {
-        val result = moviesApi.getPopularMovies()
+        val result = moviesApi.getTopRatedMovies()
 
         when (result) {
             is ApiResult.Success -> {
@@ -37,6 +37,40 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
                 println("Error fetching movies")
             }
         }
+        return result
+    }
+
+    suspend fun getUpcomingMovies(): ApiResult<MovieDTO, MoviesError> {
+        val result = moviesApi.getUpcomingMovies()
+
+        when (result) {
+            is ApiResult.Success -> {
+                val upcomingMovies = result.value.results
+                println("Fetched Movies: $upcomingMovies")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error fetching movies")
+            }
+        }
+
+        return result
+    }
+
+    suspend fun getPopularMovies(): ApiResult<MovieDTO, MoviesError> {
+        val result = moviesApi.getPopularMovies()
+
+        when (result) {
+            is ApiResult.Success -> {
+                val popularMovies = result.value.results
+                println("Fetched Movies: $popularMovies")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error fetching movies")
+            }
+        }
+
         return result
     }
 
