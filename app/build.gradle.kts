@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp").version("1.6.10-1.0.4")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -96,6 +97,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
+
+
 
 dependencies {
 

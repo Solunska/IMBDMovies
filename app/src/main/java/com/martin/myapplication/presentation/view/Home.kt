@@ -12,17 +12,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
@@ -37,27 +36,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.domain.model.MovieModel
-import com.martin.myapplication.presentation.state.UIState
 import com.martin.myapplication.presentation.ui.theme.montserrat
 import com.martin.myapplication.presentation.ui.theme.poppins
-import com.martin.myapplication.presentation.viewmodel.NowPlayingMoviesViewModel
-import com.martin.myapplication.presentation.viewmodel.PopularMoviesViewModel
-import com.martin.myapplication.presentation.viewmodel.TopMoviesViewModel
-import com.martin.myapplication.presentation.viewmodel.UpcomingMoviesViewModel
+import com.martin.myapplication.presentation.viewmodel.HomeScreenViewModel
 
 @Composable
 fun HomePage() {
-    val topMoviesViewModel: TopMoviesViewModel = hiltViewModel()
-    val topMoviesState = topMoviesViewModel.state.value
+    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+    val topMoviesState = homeScreenViewModel.state.collectAsState().value.topRatedMovies
+    val nowPlayingState = homeScreenViewModel.state.collectAsState().value.nowPlayingMovies
+    val upcomingState = homeScreenViewModel.state.collectAsState().value.upcomingMovies
+    val popularState = homeScreenViewModel.state.collectAsState().value.popularMovies
 
-    val nowPlayingMoviesViewModel: NowPlayingMoviesViewModel = hiltViewModel()
-    val nowPlayingState = nowPlayingMoviesViewModel.state.value
-
-    val upcomingMoviesViewModel: UpcomingMoviesViewModel = hiltViewModel()
-    val upcomingState = upcomingMoviesViewModel.state.value
-
-    val popularMoviesViewModel: PopularMoviesViewModel = hiltViewModel()
-    val popularState = popularMoviesViewModel.state.value
 
     val categoryState: MutableState<String> = remember {
         mutableStateOf(value = "Now playing")
@@ -87,7 +77,7 @@ fun HomePage() {
 }
 
 @Composable
-fun TopRatedMovies(state: UIState) {
+fun TopRatedMovies(state: List<MovieModel.Result>) {
     Column(Modifier.background(color = Color(0xFF242A32))) {
         Text(
             modifier = Modifier.padding(top = 42.dp, end = 26.dp),
@@ -99,7 +89,7 @@ fun TopRatedMovies(state: UIState) {
         )
 
         LazyRow(horizontalArrangement = Arrangement.spacedBy((-20).dp)) {
-            itemsIndexed(state.result) { index, movie ->
+            itemsIndexed(state) { index, movie ->
                 ShowImage(movieItem = movie, placement = index + 1)
             }
         }
@@ -168,7 +158,7 @@ var categories: MutableList<String> = mutableListOf(
 )
 
 @Composable
-fun MovieCategories(categoryState: MutableState<String>, state: UIState) {
+fun MovieCategories(categoryState: MutableState<String>, state: List<MovieModel.Result>) {
 
     LazyRow(
         horizontalArrangement = Arrangement.SpaceAround,
@@ -195,7 +185,7 @@ fun MovieCategories(categoryState: MutableState<String>, state: UIState) {
         columns = GridCells.Adaptive(minSize = 110.dp),
         modifier = Modifier.padding(end = 24.dp)
     ) {
-        items(state.result) { movie ->
+        itemsIndexed(state) { id, movie ->
 
             val imageUrl = IMAGE_BASE_URL + movie.posterPath
             AsyncImage(
