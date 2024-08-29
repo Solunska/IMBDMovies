@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -193,249 +194,262 @@ fun Details(state: State<DetailsUiState>) {
 @Composable
 fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValues) {
 
+
     val imageUrl = IMAGE_BASE_URL + state.value.movieDetails?.posterPath
 
     var activeTab by remember {
         mutableStateOf("About")
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            AsyncImage(
-                modifier = Modifier
-                    .height(250.dp)
-                    .fillMaxWidth(),
-                model = imageUrl,
-                contentDescription = state.value.movieDetails?.title,
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp),
-                contentAlignment = Alignment.BottomEnd
-            ) {
+    if (state.value.isLoading) {
+        Box(contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+//            AsyncImage(
+//                modifier = Modifier
+//                    .height(250.dp)
+//                    .fillMaxWidth(),
+//                model = imageUrl,
+//                contentDescription = state.value.movieDetails?.title,
+//            )
                 Box(
                     modifier = Modifier
-                        .padding(bottom = 25.dp, end = 20.dp)
-                        .width(56.dp)
-                        .height(26.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center,
+                        .fillMaxWidth(),
+//                    .height(250.dp),
+                    contentAlignment = Alignment.BottomEnd
                 ) {
                     Box(
                         modifier = Modifier
-                            .height(40.dp)
-                            .fillMaxHeight()
-                            .background(Brush.horizontalGradient(colorStops = colorStops))
-                            .clip(RoundedCornerShape(20.dp)),
-                        contentAlignment = Alignment.Center
+                            .padding(bottom = 25.dp, end = 32.dp)
+                            .width(56.dp)
+                            .height(26.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
+                                .height(40.dp)
+                                .fillMaxHeight()
+                                .background(Brush.horizontalGradient(colorStops = colorStops))
+                                .clip(RoundedCornerShape(20.dp)),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                modifier = Modifier.height(35.dp),
-                                painter = painterResource(id = R.drawable.star),
-                                contentDescription = "Stars",
-                                tint = Color(0xFFFF8700)
-                            )
-                            Box(
-                                modifier = Modifier.height(35.dp),
-                                contentAlignment = Alignment.Center
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp)
                             ) {
-                                Text(
-                                    text = movie.rating.toString(),
-                                    color = Color(0xFFFF8700),
-                                    fontSize = 12.5.sp,
-                                    fontFamily = poppins,
-                                    fontWeight = FontWeight.SemiBold
+                                Icon(
+                                    modifier = Modifier.height(35.dp),
+                                    painter = painterResource(id = R.drawable.star),
+                                    contentDescription = "Stars",
+                                    tint = Color(0xFFFF8700)
                                 )
+                                Box(
+                                    modifier = Modifier.height(35.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = movie.rating.toString(),
+                                        color = Color(0xFFFF8700),
+                                        fontSize = 12.5.sp,
+                                        fontFamily = poppins,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 30.dp)
-                .absoluteOffset(y = (-70).dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            AsyncImage(
-                modifier = Modifier
-                    .height(140.dp)
-                    .width(95.dp),
-                model = imageUrl,
-                contentDescription = state.value.movieDetails?.title,
-            )
-            Text(
-                text = state.value.movieDetails?.title.toString(),
-                fontSize = 18.sp,
-                fontFamily = poppins,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-                modifier = Modifier.width(210.dp)
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .height(40.dp)
-                .fillMaxWidth()
-                .absoluteOffset(y = (-50).dp),
-            contentAlignment = Alignment.Center,
-        ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 30.dp)
+                    .absoluteOffset(y = (-70).dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                IconWithText(
-                    modifier = Modifier,
-                    icon = R.drawable.calendarblank,
-                    text = state.value.movieDetails?.releaseDate.toString(),
-                    details = true
+                AsyncImage(
+                    modifier = Modifier
+                        .height(200.dp)
+                        .width(120.dp),
+                    model = imageUrl,
+                    contentDescription = state.value.movieDetails?.title,
                 )
-                Box(
-                    modifier = Modifier.fillMaxHeight(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "|", color = Color(0xFF92929D))
-                }
-                IconWithText(
-                    modifier = Modifier.height(20.dp),
-                    icon = R.drawable.clock,
-                    text = movie.duration.toString(),
-                    details = true
+                Text(
+                    text = state.value.movieDetails?.title.toString(),
+                    fontSize = 32.sp,
+                    fontFamily = poppins,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                    modifier = Modifier.width(210.dp),
+                    lineHeight = 34.sp
                 )
-                Box(
-                    modifier = Modifier.fillMaxHeight(),
-                    contentAlignment = Alignment.Center
+            }
+
+            Box(
+                modifier = Modifier
+                    .height(40.dp)
+                    .fillMaxWidth()
+                    .absoluteOffset(y = (-50).dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "|", color = Color(0xFF92929D))
-                }
-                state.value.movieDetails?.genres?.get(1)?.name?.let {
                     IconWithText(
-                        modifier = Modifier.height(20.dp),
-                        icon = R.drawable.ticket,
-                        text = it,
+                        modifier = Modifier,
+                        icon = R.drawable.calendarblank,
+                        text = state.value.movieDetails?.releaseDate.toString(),
                         details = true
                     )
+                    Box(
+                        modifier = Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "|", color = Color(0xFF92929D))
+                    }
+                    IconWithText(
+                        modifier = Modifier.height(20.dp),
+                        icon = R.drawable.clock,
+                        text = movie.duration.toString(),
+                        details = true
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "|", color = Color(0xFF92929D))
+                    }
+                    state.value.movieDetails?.genres?.get(1)?.name?.let {
+                        IconWithText(
+                            modifier = Modifier.height(20.dp),
+                            icon = R.drawable.ticket,
+                            text = it,
+                            details = true
+                        )
+                    }
                 }
             }
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .absoluteOffset(y = (-20).dp)
-                .padding(start = 30.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .absoluteOffset(y = (-20).dp)
+                    .padding(start = 30.dp),
             ) {
-                Box(
-                    modifier = if (activeTab == "About") Modifier
-                        .background(Color(0xFF3A3F47))
-                        .height(30.dp)
-                    else Modifier
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    ClickableText(
-                        modifier = Modifier
-                            .background(Color(0xFF242A32))
-                            .padding(bottom = 4.dp)
-                            .width(110.dp),
-                        onClick = {
-                            activeTab = "About"
-                        },
-                        text = AnnotatedString("About Movie"),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontFamily = poppins,
-                            fontWeight = if (activeTab == "About") FontWeight.Bold else FontWeight.Medium,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        ),
-                    )
-                }
-                Box(
-                    modifier = if (activeTab == "Reviews") Modifier
-                        .background(Color(0xFF3A3F47))
-                        .height(30.dp)
-                    else Modifier
-                ) {
-                    ClickableText(
-                        modifier = Modifier
-                            .background(Color(0xFF242A32))
-                            .width(75.dp)
-                            .padding(bottom = 4.dp),
-                        onClick = {
-                            activeTab = "Reviews"
-                        },
-                        text = AnnotatedString("Reviews"),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontFamily = poppins,
-                            fontWeight = if (activeTab == "Reviews") FontWeight.Bold else FontWeight.Medium,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        ),
-                    )
-                }
-                Box(
-                    modifier = if (activeTab == "Cast") Modifier
-                        .background(Color(0xFF3A3F47))
-                        .height(30.dp) else Modifier
-                ) {
-                    ClickableText(
-                        modifier = Modifier
-                            .background(Color(0xFF242A32))
-                            .width(50.dp)
-                            .padding(bottom = 4.dp),
-                        onClick = {
-                            activeTab = "Cast"
-                        },
-                        text = AnnotatedString("Cast"),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontFamily = poppins,
-                            fontWeight = if (activeTab == "Cast") FontWeight.Bold else FontWeight.Medium,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
-                        ),
-                    )
+                    Box(
+                        modifier = if (activeTab == "About") Modifier
+                            .background(Color(0xFF3A3F47))
+                            .height(30.dp)
+                        else Modifier
+                    ) {
+                        ClickableText(
+                            modifier = Modifier
+                                .background(Color(0xFF242A32))
+                                .padding(bottom = 4.dp)
+                                .width(110.dp),
+                            onClick = {
+                                activeTab = "About"
+                            },
+                            text = AnnotatedString("About Movie"),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontFamily = poppins,
+                                fontWeight = if (activeTab == "About") FontWeight.Bold else FontWeight.Medium,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            ),
+                        )
+                    }
+                    Box(
+                        modifier = if (activeTab == "Reviews") Modifier
+                            .background(Color(0xFF3A3F47))
+                            .height(30.dp)
+                        else Modifier
+                    ) {
+                        ClickableText(
+                            modifier = Modifier
+                                .background(Color(0xFF242A32))
+                                .width(75.dp)
+                                .padding(bottom = 4.dp),
+                            onClick = {
+                                activeTab = "Reviews"
+                            },
+                            text = AnnotatedString("Reviews"),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontFamily = poppins,
+                                fontWeight = if (activeTab == "Reviews") FontWeight.Bold else FontWeight.Medium,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            ),
+                        )
+                    }
+                    Box(
+                        modifier = if (activeTab == "Cast") Modifier
+                            .background(Color(0xFF3A3F47))
+                            .height(30.dp) else Modifier
+                    ) {
+                        ClickableText(
+                            modifier = Modifier
+                                .background(Color(0xFF242A32))
+                                .width(50.dp)
+                                .padding(bottom = 4.dp),
+                            onClick = {
+                                activeTab = "Cast"
+                            },
+                            text = AnnotatedString("Cast"),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontFamily = poppins,
+                                fontWeight = if (activeTab == "Cast") FontWeight.Bold else FontWeight.Medium,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            ),
+                        )
+                    }
                 }
             }
-        }
 
-        if (activeTab == "About") {
-            AboutContent(state.value.movieDetails?.overview)
-        } else if (activeTab == "Reviews") {
-            LazyColumn(
-                modifier = Modifier.padding(start = 30.dp, end = 24.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(movie.reviews) { review ->
-                    ReviewsContent(
-                        name = review.name,
-                        rating = review.reviewStars,
-                        review = review.reviewContent
-                    )
+            if (activeTab == "About") {
+                AboutContent(state.value.movieDetails?.overview)
+            } else if (activeTab == "Reviews") {
+                LazyColumn(
+                    modifier = Modifier.padding(start = 30.dp, end = 24.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    state.value.movieReviews?.let {
+                        items(it.results) { review ->
+                            ReviewsContent(
+                                name = review.authorDetails.name ?: "",
+                                rating = review.authorDetails.rating?.toDouble() ?: 0.0,
+                                review = review.content,
+                                avatar = review.authorDetails.avatarPath ?: ""
+
+                            )
+                        }
+                    }
                 }
-            }
-        } else LazyVerticalGrid(
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            columns = GridCells.Adaptive(minSize = 140.dp)
-        ) {
-            items(movie.cast) { cast ->
-                CastContent(name = cast.name, photo = cast.image)
+            } else LazyVerticalGrid(
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                columns = GridCells.Adaptive(minSize = 140.dp)
+            ) {
+                items(movie.cast) { cast ->
+                    CastContent(name = cast.name, photo = cast.image)
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -453,15 +467,17 @@ fun AboutContent(overview: String?) {
 
 
 @Composable
-fun ReviewsContent(name: String, rating: Double, review: String) {
+fun ReviewsContent(name: String, rating: Double, review: String, avatar: String) {
+    val imageUrl = IMAGE_BASE_URL + avatar
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Image(
+
+            AsyncImage(
                 modifier = Modifier
                     .height(44.dp)
                     .width(44.dp),
-                painter = painterResource(id = R.drawable.profile_photo),
-                contentDescription = "Profile Photo"
+                model = imageUrl,
+                contentDescription = name,
             )
             Text(
                 modifier = Modifier.width(44.dp),

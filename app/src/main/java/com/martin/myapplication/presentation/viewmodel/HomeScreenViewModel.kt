@@ -31,6 +31,10 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getMovies() {
+        _state.update { uiState ->
+            uiState.copy(isLoading = true)
+        }
+
         val combinedFlow = combine(
             getTopRatedMovies.invoke(),
             getNowPlayingMovies.invoke(),
@@ -67,9 +71,11 @@ class HomeScreenViewModel @Inject constructor(
                     topRatedMovies = topRatedMovies,
                     nowPlayingMovies = nowPlayingMovies,
                     popularMovies = popularMovies,
-                    upcomingMovies = upcomingMovies
+                    upcomingMovies = upcomingMovies,
+                    isLoading = false
                 )
             }
+
         }.launchIn(viewModelScope)
     }
 }

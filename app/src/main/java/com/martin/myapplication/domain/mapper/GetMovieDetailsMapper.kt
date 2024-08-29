@@ -17,8 +17,11 @@ class GetMovieDetailsMapper @Inject constructor() {
                 ApiResult.success(movieModel)
             }
 
-            is ApiResult.Failure -> {
-                TODO()
+            is ApiResult.Failure -> when (response) {
+                is ApiResult.Failure.NetworkFailure -> error("")
+                is ApiResult.Failure.HttpFailure -> error("")
+                is ApiResult.Failure.ApiFailure -> error("")
+                is ApiResult.Failure.UnknownFailure -> error("")
             }
         }
     }

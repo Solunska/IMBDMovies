@@ -1,5 +1,6 @@
 package com.martin.myapplication.presentation.view
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +18,14 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
@@ -42,6 +45,7 @@ import com.martin.myapplication.presentation.ui.theme.montserrat
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.HomeScreenViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun HomePage(goToDetails: (Int) -> Unit) {
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
@@ -50,6 +54,7 @@ fun HomePage(goToDetails: (Int) -> Unit) {
     val upcomingState = homeScreenViewModel.state.collectAsState().value.upcomingMovies
     val popularState = homeScreenViewModel.state.collectAsState().value.popularMovies
 
+    val isLoading = homeScreenViewModel.state.value.isLoading
 
     val categoryState: MutableState<String> = remember {
         mutableStateOf(value = "Now playing")
@@ -72,16 +77,27 @@ fun HomePage(goToDetails: (Int) -> Unit) {
             .background(color = Color(0xFF242A32))
             .padding(start = 24.dp)
     ) {
-        TopRatedMovies(topMoviesState)
-        MovieCategories(categoryState, movieItems) { movieId ->
-            goToDetails(movieId)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color(0xFF0296E5))
+            }
+        }else {
+            TopRatedMovies(topMoviesState)
+            MovieCategories(categoryState, movieItems) { movieId ->
+                goToDetails(movieId)
+            }
         }
+
     }
 
 }
 
 @Composable
 fun TopRatedMovies(state: List<MovieModel.Result>) {
+
     Column(Modifier.background(color = Color(0xFF242A32))) {
         Text(
             modifier = Modifier.padding(top = 42.dp, end = 26.dp),

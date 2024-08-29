@@ -3,6 +3,7 @@ package com.martin.myapplication.data.repository
 import com.martin.myapplication.data.remote.api.MoviesApi
 import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
+import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
 import com.slack.eithernet.ApiResult
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
             }
 
             is ApiResult.Failure -> {
-                println("Error fetching movies")
+                println("Error fetching now playing movies")
             }
         }
         return result
@@ -51,7 +52,7 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
             }
 
             is ApiResult.Failure -> {
-                println("Error fetching movies")
+                println("Error fetching upcoming movies")
             }
         }
 
@@ -68,7 +69,7 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
             }
 
             is ApiResult.Failure -> {
-                println("Error fetching movies")
+                println("Error fetching popular movies")
             }
         }
 
@@ -85,7 +86,24 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
             }
 
             is ApiResult.Failure -> {
-                println("Error fetching movies")
+                println("Error fetching movie details")
+            }
+        }
+
+        return result
+    }
+
+    suspend fun getMovieReviews(id: Int): ApiResult<MovieReviewsDTO,MoviesError> {
+        val result = moviesApi.getMovieReviews(id)
+
+        when (result) {
+            is ApiResult.Success -> {
+                val movieReviews = result.value.results
+                println("Fetched Movie Reviews: $movieReviews")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error fetching movie reviews")
             }
         }
 
