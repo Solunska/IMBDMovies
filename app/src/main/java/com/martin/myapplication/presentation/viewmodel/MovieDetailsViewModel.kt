@@ -32,12 +32,10 @@ class MovieDetailsViewModel @Inject constructor(
                 _state.update { uiState ->
                     when(result){
                         is ApiResult.Success -> uiState.copy(
-//                            isLoading = false,
                             movieDetails = result.value,
                             error = ""
                         )
                         is ApiResult.Failure -> uiState.copy(
-//                            isLoading = false,
                             movieDetails = null,
                             error = ""
                         )

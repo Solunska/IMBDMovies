@@ -6,6 +6,7 @@ import com.martin.myapplication.domain.model.MovieReviewsModel
 data class DetailsUiState(
     val isLoading: Boolean = false,
     val movieDetails: MovieDetailsModel? = null,
-    var error: String = "",
-    val movieReviews: MovieReviewsModel? = null
+    val movieReviews: MovieReviewsModel? = null,
+    var error: String = ""
+
 )

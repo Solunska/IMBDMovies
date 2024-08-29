@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.martin.myapplication.R
 import com.martin.myapplication.presentation.ui.theme.poppins
 
@@ -103,9 +102,9 @@ fun SavedContent() {
             .padding(horizontal = 24.dp, vertical = 12.dp)
             .fillMaxSize()
     ) {
-        items(movies) { movie ->
-            MovieCard(movieItem = movie)
-        }
+//        items(movies) { movie ->
+//            MovieCard(movieItem = movie)
+//        }
     }
 }
 

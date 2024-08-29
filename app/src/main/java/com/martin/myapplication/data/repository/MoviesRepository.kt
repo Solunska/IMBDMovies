@@ -5,6 +5,8 @@ import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
+import com.martin.myapplication.data.remote.dto.SearchMovieDTO
+import com.martin.myapplication.presentation.view.Movie
 import com.slack.eithernet.ApiResult
 import javax.inject.Inject
 
@@ -93,7 +95,7 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
         return result
     }
 
-    suspend fun getMovieReviews(id: Int): ApiResult<MovieReviewsDTO,MoviesError> {
+    suspend fun getMovieReviews(id: Int): ApiResult<MovieReviewsDTO, MoviesError> {
         val result = moviesApi.getMovieReviews(id)
 
         when (result) {
@@ -104,6 +106,23 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
 
             is ApiResult.Failure -> {
                 println("Error fetching movie reviews")
+            }
+        }
+
+        return result
+    }
+
+    suspend fun getMovieFromSearch(input: String): ApiResult<SearchMovieDTO, MoviesError> {
+        val result = moviesApi.getMovieFromSearch(input)
+
+        when (result) {
+            is ApiResult.Success -> {
+                val movies = result.value.results
+                println("Fetched Movie Results from input $input: $movies")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error fetching movie results")
             }
         }
 

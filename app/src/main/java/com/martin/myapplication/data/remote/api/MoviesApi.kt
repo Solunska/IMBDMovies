@@ -4,6 +4,7 @@ import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
+import com.martin.myapplication.data.remote.dto.SearchMovieDTO
 import com.slack.eithernet.ApiResult
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -48,4 +49,11 @@ interface MoviesApi {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
     ): ApiResult<MovieReviewsDTO, MoviesError>
+
+    @GET("search/movie")
+    suspend fun getMovieFromSearch(
+        @Query("query") input: String,
+        @Query("language") language: String = "en-US",
+        @Query("page") page: Int = 1,
+    ): ApiResult<SearchMovieDTO, MoviesError>
 }

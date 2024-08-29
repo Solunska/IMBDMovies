@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,8 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.IconButton
 //noinspection UsingMaterialAndMaterial3Libraries
@@ -31,10 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,16 +43,27 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.domain.model.SearchMovieModel
+import com.martin.myapplication.presentation.state.SearchUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
-import androidx.navigation.NavHostController as NavHostController1
+import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
+import com.martin.myapplication.presentation.viewmodel.SearchViewModel
 
 @Composable
 fun SearchPage() {
-    SearchResults()
+
+    val searchViewModel: SearchViewModel = hiltViewModel()
+    val searchState = searchViewModel.state.collectAsState()
+    val searchInput = searchViewModel.searchText.collectAsState()
+    val isSearching = searchViewModel.isSearching.collectAsState()
+
+    SearchResults(searchViewModel, searchState, searchInput, isSearching)
 }
 
 sealed class ColItem(
@@ -60,7 +72,7 @@ sealed class ColItem(
     val rating: Double,
     val genre: String,
     val year: Int,
-    val duration: Int
+    val duration: Int,
 ) {
     data object Movie1 : ColItem(R.drawable.movie_1, "name", 9.5, "genre", 2020, 120)
     data object Movie2 : ColItem(R.drawable.movie_1, "name", 9.5, "genre", 2020, 120)
@@ -76,7 +88,12 @@ var movies: MutableList<ColItem> = mutableListOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResults() {
+fun SearchResults(
+    searchViewModel: SearchViewModel,
+    searchState: State<SearchUiState>,
+    searchInput: State<String>,
+    isSearching: State<Boolean>,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val hasResults by remember {
         mutableStateOf(true)
@@ -127,27 +144,34 @@ fun SearchResults() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            SearchBar(innerPadding)
-            if (hasResults)
-                SearchContent()
-            else
+            SearchBar(innerPadding, searchInput, searchViewModel,searchState)
+
+            if (isSearching.value) {
+                // Display loading indicator
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else if (searchState.value.movies.isEmpty()) {
+                // Display "No Results" page
                 NoResultsPage()
+            } else {
+                SearchContent(searchState.value.movies)
+            }
         }
     }
 }
 
 @Composable
-fun SearchBar(innerPadding: PaddingValues) {
-    var searchInput by remember {
-        mutableStateOf("")
-    }
-
+fun SearchBar(
+    innerPadding: PaddingValues,
+    searchInput: State<String>,
+    searchViewModel: SearchViewModel,
+    searchState: State<SearchUiState>,
+) {
     TextField(
         modifier = Modifier
             .height(53.dp)
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
-        value = searchInput,
+        value = searchInput.value,
         placeholder = {
             Text(
                 modifier = Modifier
@@ -157,13 +181,13 @@ fun SearchBar(innerPadding: PaddingValues) {
                 fontSize = 16.sp,
             )
         },
-        onValueChange = { searchInput = it },
+        onValueChange = { searchViewModel.onSearchTextChange(it) },
         singleLine = true,
         shape = RoundedCornerShape(20.dp),
         trailingIcon = {
             IconButton(
                 modifier = Modifier.padding(end = 10.dp),
-                onClick = { /*TODO*/ }) {
+                onClick = {  searchViewModel.getMovieResults(searchInput.value) }) {
                 Icon(
                     painter = painterResource(R.drawable.search_icon_only),
                     contentDescription = "sda",
@@ -182,32 +206,37 @@ fun SearchBar(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun SearchContent() {
+fun SearchContent(movie: List<SearchMovieModel.Result>) {
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 24.dp, vertical = 12.dp)
             .fillMaxSize()
     ) {
-        items(movies) { movie ->
-            MovieCard(movieItem = movie)
+        itemsIndexed(movie) { id, movie ->
+            MovieCard(movie)
         }
     }
 }
 
 @Composable
-fun MovieCard(movieItem: ColItem) {
+fun MovieCard(movieItem: SearchMovieModel.Result) {
+    val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
+    val state = movieDetailsViewModel.state.collectAsState()
+    val imageUrl = IMAGE_BASE_URL + movieItem.posterPath
+
     Row(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxSize()
     ) {
-        Image(
+        AsyncImage(
             modifier = Modifier
                 .height(150.dp)
                 .width(106.dp),
-            painter = painterResource(id = movieItem.photo),
-            contentDescription = "movie photo"
+            model = imageUrl,
+            contentDescription = movieItem.originalTitle,
         )
+
         Column(
             modifier = Modifier
                 .height(150.dp)
@@ -215,7 +244,7 @@ fun MovieCard(movieItem: ColItem) {
                 .fillMaxSize(),
         ) {
             Text(
-                text = movieItem.name,
+                text = movieItem.originalTitle,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.White,
@@ -230,27 +259,29 @@ fun MovieCard(movieItem: ColItem) {
                 IconWithText(
                     modifier = Modifier,
                     icon = R.drawable.star,
-                    text = movieItem.rating.toString(),
+                    text = 9.5.toString(),
                     details = false
                 )
-                IconWithText(
-                    modifier = Modifier,
-                    icon = R.drawable.ticket,
-                    text = movieItem.genre,
-                    details = false
+                state.value.movieDetails?.genres?.get(movieItem.genreIds.get(1))?.name?.let {
+                    IconWithText(
+                        modifier = Modifier,
+                        icon = R.drawable.ticket,
+                        text = it,
+                        details = false
 
-                )
+                    )
+                }
                 IconWithText(
                     modifier = Modifier,
                     icon = R.drawable.calendarblank,
-                    text = movieItem.year.toString(),
+                    text = movieItem.releaseDate,
                     details = false
 
                 )
                 IconWithText(
                     modifier = Modifier,
                     icon = R.drawable.clock,
-                    text = "${movieItem.duration} minutes",
+                    text = "120 minutes",
                     details = false
                 )
             }
@@ -328,8 +359,8 @@ fun NoResultsPage() {
     }
 }
 
-@Preview
-@Composable
-fun SearchPreview() {
-    SearchPage()
-}
+//@Preview
+//@Composable
+//fun SearchPreview() {
+//    SearchPage()
+//}

@@ -1,7 +1,3 @@
-Here's a draft of a README file for your GitHub project:
-
----
-
 # Android IMDb API Internship Project
 
 ## Overview

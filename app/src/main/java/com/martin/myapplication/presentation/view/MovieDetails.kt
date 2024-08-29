@@ -327,6 +327,8 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                     ) {
                         Text(text = "|", color = Color(0xFF92929D))
                     }
+
+
                     state.value.movieDetails?.genres?.get(1)?.name?.let {
                         IconWithText(
                             modifier = Modifier.height(20.dp),
