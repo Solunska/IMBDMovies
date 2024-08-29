@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.domain.model.MovieModel
@@ -84,8 +83,11 @@ fun HomePage(goToDetails: (Int) -> Unit) {
             ) {
                 CircularProgressIndicator(color = Color(0xFF0296E5))
             }
-        }else {
-            TopRatedMovies(topMoviesState)
+        } else {
+            TopRatedMovies(topMoviesState) { movieId ->
+                goToDetails(movieId)
+
+            }
             MovieCategories(categoryState, movieItems) { movieId ->
                 goToDetails(movieId)
             }
@@ -96,7 +98,7 @@ fun HomePage(goToDetails: (Int) -> Unit) {
 }
 
 @Composable
-fun TopRatedMovies(state: List<MovieModel.Result>) {
+fun TopRatedMovies(state: List<MovieModel.Result>, onClick: (Int) -> Unit) {
 
     Column(Modifier.background(color = Color(0xFF242A32))) {
         Text(
@@ -110,7 +112,7 @@ fun TopRatedMovies(state: List<MovieModel.Result>) {
 
         LazyRow(horizontalArrangement = Arrangement.spacedBy((-20).dp)) {
             itemsIndexed(state) { index, movie ->
-                ShowImage(movieItem = movie, placement = index + 1)
+                ShowImage(movieItem = movie, placement = index + 1, onClick)
             }
         }
 
@@ -118,14 +120,15 @@ fun TopRatedMovies(state: List<MovieModel.Result>) {
 }
 
 @Composable
-fun ShowImage(movieItem: MovieModel.Result, placement: Int) {
+fun ShowImage(movieItem: MovieModel.Result, placement: Int, onClick: (Int) -> Unit) {
     val imageUrl = IMAGE_BASE_URL + movieItem.posterPath
 
     AsyncImage(
         modifier = Modifier
             .padding(top = 24.dp)
             .padding(start = 12.dp)
-            .size(height = 210.dp, width = 144.61.dp),
+            .size(height = 210.dp, width = 144.61.dp)
+            .clickable { onClick(movieItem.id) },
         model = imageUrl,
         contentDescription = movieItem.title,
     )
