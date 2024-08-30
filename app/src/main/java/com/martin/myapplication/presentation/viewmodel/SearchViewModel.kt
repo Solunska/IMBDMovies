@@ -15,12 +15,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Suppress("OPT_IN_USAGE")
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val getSearchResults: GetSearchResultsUseCase,
@@ -35,8 +38,24 @@ class SearchViewModel @Inject constructor(
     private val _state = MutableStateFlow(SearchUiState())
     val state: StateFlow<SearchUiState> = _state
 
+    init {
+        searchText
+            .debounce(1000)
+            .onEach { _isSearching.update { true } }
+            .filter { it.isNotEmpty() }
+            .onEach { query ->
+                getMovieResults(query)
+            }
+            .onEach { _isSearching.update { false } }
+            .launchIn(viewModelScope)
+    }
+
     fun onSearchTextChange(text: String) {
         _searchText.value = text
+    }
+
+    fun onEmptyInput() {
+        _state.update { it.copy(movies = emptyList()) }
     }
 
     fun getMovieResults(input: String) {

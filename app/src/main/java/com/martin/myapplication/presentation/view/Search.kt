@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,6 +55,7 @@ import com.martin.myapplication.presentation.state.SearchUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
 import com.martin.myapplication.presentation.viewmodel.SearchViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun SearchPage(goBack: () -> Unit) {
@@ -147,11 +149,14 @@ fun SearchResults(
         ) {
             SearchBar(innerPadding, searchInput, searchViewModel, searchState)
 
-            if (isSearching.value) {
-                // Display loading indicator
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else if (searchState.value.movies.isEmpty() && searchInput.value != "") {
-                // Display "No Results" page
+            if (isSearching.value && searchInput.value != "") {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 30.dp),
+                    color = Color(0xFF0296E5)
+                )
+            } else if (searchState.value.movies.isEmpty() && searchInput.value != "" && !isSearching.value) {
                 NoResultsPage()
             } else {
                 SearchContent(searchState.value.movies)
@@ -182,7 +187,12 @@ fun SearchBar(
                 fontSize = 16.sp,
             )
         },
-        onValueChange = { searchViewModel.onSearchTextChange(it) },
+        onValueChange = {
+            searchViewModel.onSearchTextChange(it)
+            if (it.isEmpty()) {
+                searchViewModel.onEmptyInput()
+            }
+        },
         singleLine = true,
         shape = RoundedCornerShape(20.dp),
         trailingIcon = {
@@ -201,7 +211,9 @@ fun SearchBar(
             backgroundColor = Color(0xFF3A3F47),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
+            disabledIndicatorColor = Color.Transparent,
+            textColor = Color.White,
+            cursorColor = Color.Gray,
         ),
     )
 }
