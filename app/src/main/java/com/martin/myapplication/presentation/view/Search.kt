@@ -56,14 +56,14 @@ import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
 import com.martin.myapplication.presentation.viewmodel.SearchViewModel
 
 @Composable
-fun SearchPage() {
+fun SearchPage(goBack: () -> Unit) {
 
     val searchViewModel: SearchViewModel = hiltViewModel()
     val searchState = searchViewModel.state.collectAsState()
     val searchInput = searchViewModel.searchText.collectAsState()
     val isSearching = searchViewModel.isSearching.collectAsState()
 
-    SearchResults(searchViewModel, searchState, searchInput, isSearching)
+    SearchResults(goBack, searchViewModel, searchState, searchInput, isSearching)
 }
 
 sealed class ColItem(
@@ -89,6 +89,7 @@ var movies: MutableList<ColItem> = mutableListOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResults(
+    goBack: () -> Unit,
     searchViewModel: SearchViewModel,
     searchState: State<SearchUiState>,
     searchInput: State<String>,
@@ -116,7 +117,7 @@ fun SearchResults(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { goBack() }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_button_back),
                             contentDescription = "back button",
@@ -144,12 +145,12 @@ fun SearchResults(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            SearchBar(innerPadding, searchInput, searchViewModel,searchState)
+            SearchBar(innerPadding, searchInput, searchViewModel, searchState)
 
             if (isSearching.value) {
                 // Display loading indicator
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else if (searchState.value.movies.isEmpty()) {
+            } else if (searchState.value.movies.isEmpty() && searchInput.value != "") {
                 // Display "No Results" page
                 NoResultsPage()
             } else {
@@ -187,7 +188,7 @@ fun SearchBar(
         trailingIcon = {
             IconButton(
                 modifier = Modifier.padding(end = 10.dp),
-                onClick = {  searchViewModel.getMovieResults(searchInput.value) }) {
+                onClick = { searchViewModel.getMovieResults(searchInput.value) }) {
                 Icon(
                     painter = painterResource(R.drawable.search_icon_only),
                     contentDescription = "sda",

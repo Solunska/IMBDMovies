@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,14 +36,14 @@ import com.martin.myapplication.R
 import com.martin.myapplication.presentation.ui.theme.poppins
 
 @Composable
-fun SavedMoviesPage() {
-    SavedMovies()
+fun SavedMoviesPage(goBack: () -> Unit,) {
+    SavedMovies(goBack)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavedMovies() {
+fun SavedMovies(goBack: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val hasMoviesInWatchList by remember {
         mutableStateOf(true)
@@ -67,7 +66,7 @@ fun SavedMovies() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { goBack() }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_button_back),
                             contentDescription = "back button",
@@ -148,8 +147,8 @@ fun EmptyWatchList() {
 }
 
 
-@Preview
-@Composable
-fun SavedMoviesPagePreview() {
-    SavedMoviesPage()
-}
+//@Preview
+//@Composable
+//fun SavedMoviesPagePreview() {
+//    SavedMoviesPage()
+//}

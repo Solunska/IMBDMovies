@@ -62,7 +62,7 @@ import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
 
 @Composable
-fun MovieDetailsPage(id: Int) {
+fun MovieDetailsPage(goBack: () -> Unit, id: Int) {
     val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
     val movieDetailsState = movieDetailsViewModel.state.collectAsState()
 
@@ -70,7 +70,7 @@ fun MovieDetailsPage(id: Int) {
         movieDetailsViewModel.fetchMovieDetails(id)
     }
 
-    Details(movieDetailsState)
+    Details(goBack, movieDetailsState)
 }
 
 class Movie(
@@ -136,7 +136,7 @@ val colorStops = arrayOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Details(state: State<DetailsUiState>) {
+fun Details(goBack: () -> Unit, state: State<DetailsUiState>) {
     val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
@@ -155,7 +155,7 @@ fun Details(state: State<DetailsUiState>) {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { goBack() }) {
                         Icon(
                             painter = painterResource(R.drawable.icon_button_back),
                             contentDescription = "Back"

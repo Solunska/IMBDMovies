@@ -94,14 +94,14 @@ fun MainPage() {
                     navController.navigate("movie_details/$movieId")
                 })
             }
-            composable(BottomNavItem.Search.route) { SearchPage() }
-            composable(BottomNavItem.Saved.route) { SavedMoviesPage() }
+            composable(BottomNavItem.Search.route) { SearchPage(goBack = { navController.navigateUp() }) }
+            composable(BottomNavItem.Saved.route) { SavedMoviesPage(goBack = { navController.navigateUp() }) }
             composable(
                 "movie_details/{movieId}",
                 arguments = listOf(navArgument("movieId") { type = NavType.IntType })
             ) { backStackEntry ->
                 val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
-                MovieDetailsPage(id = movieId)
+                MovieDetailsPage(goBack = { navController.navigateUp() }, id = movieId)
             }
         }
 
