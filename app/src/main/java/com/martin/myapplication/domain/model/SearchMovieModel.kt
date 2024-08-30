@@ -9,7 +9,7 @@ data class SearchMovieModel(
     data class Result(
         val genreIds: List<Int>,
         val originalTitle: String,
-        val posterPath: String,
+        val posterPath: String?,
         val releaseDate: String,
     )
 }

@@ -1,6 +1,7 @@
 package com.martin.myapplication.presentation.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -175,9 +176,8 @@ fun Details(goBack: () -> Unit, state: State<DetailsUiState>) {
                     containerColor = Color(0xFF242A32),
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
-                ),
-                scrollBehavior = scrollBehaviour
+                    actionIconContentColor = Color.White,
+                )
             )
         }
     ) { innerPadding ->
@@ -218,7 +218,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                    .height(250.dp),
+                        .height(250.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
                     Box(
@@ -436,7 +436,6 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                                 rating = review.authorDetails.rating?.toDouble() ?: 0.0,
                                 review = review.content,
                                 avatar = review.authorDetails.avatarPath ?: ""
-
                             )
                         }
                     }
@@ -474,13 +473,25 @@ fun ReviewsContent(name: String, rating: Double, review: String, avatar: String)
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
 
-            AsyncImage(
-                modifier = Modifier
-                    .height(44.dp)
-                    .width(44.dp),
-                model = imageUrl,
-                contentDescription = name,
-            )
+            if (avatar.isEmpty()) {
+                Log.d("MovieCard", "Poster path is null")
+                Image(
+                    modifier = Modifier
+                        .height(44.dp)
+                        .width(44.dp),
+                    painter = painterResource(id = R.drawable.profile_photo),
+                    contentDescription = "no poster image",
+
+                    )
+            } else {
+                AsyncImage(
+                    modifier = Modifier
+                        .height(44.dp)
+                        .width(44.dp),
+                    model = imageUrl,
+                    contentDescription = name,
+                )
+            }
             Text(
                 modifier = Modifier.width(44.dp),
                 text = rating.toString(),
@@ -492,7 +503,7 @@ fun ReviewsContent(name: String, rating: Double, review: String, avatar: String)
         }
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                text = name,
+                text = if (name == "") "No Username" else name,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontFamily = poppins,

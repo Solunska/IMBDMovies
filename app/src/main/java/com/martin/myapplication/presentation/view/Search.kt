@@ -1,5 +1,6 @@
 package com.martin.myapplication.presentation.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -242,13 +244,26 @@ fun MovieCard(movieItem: SearchMovieModel.Result) {
             .padding(8.dp)
             .fillMaxSize()
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .height(150.dp)
-                .width(106.dp),
-            model = imageUrl,
-            contentDescription = movieItem.originalTitle,
-        )
+        if (movieItem.posterPath.isNullOrEmpty()) {
+            Log.d("MovieCard", "Poster path is null")
+            Image(
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(106.dp),
+                painter = painterResource(id = R.drawable.poster_placeholder),
+                contentDescription = "no poster image",
+
+            )
+        } else {
+            Log.d("MovieCard", "Poster Path: ${movieItem.posterPath}")
+            AsyncImage(
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(106.dp),
+                model = imageUrl,
+                contentDescription = movieItem.originalTitle,
+            )
+        }
 
         Column(
             modifier = Modifier
