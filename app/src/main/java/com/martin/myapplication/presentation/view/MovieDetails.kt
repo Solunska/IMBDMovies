@@ -208,25 +208,25 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
     } else {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth()) {
-//            AsyncImage(
-//                modifier = Modifier
-//                    .height(250.dp)
-//                    .fillMaxWidth(),
-//                model = imageUrl,
-//                contentDescription = state.value.movieDetails?.title,
-//            )
+                Image(
+                    modifier = Modifier
+                        .height(240.dp)
+                        .fillMaxWidth(),
+                    painter = painterResource(id = R.drawable.cover1),
+                    contentDescription = "Cover Photo"
+                )
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-//                    .height(250.dp),
+                        .fillMaxWidth()
+                    .height(250.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
                     Box(
                         modifier = Modifier
-                            .padding(bottom = 25.dp, end = 32.dp)
-                            .width(56.dp)
-                            .height(26.dp)
-                            .clip(RoundedCornerShape(8.dp)),
+                            .padding(bottom = 30.dp, end = 32.dp)
+                            .width(76.dp)
+                            .height(40.dp)
+                            .clip(RoundedCornerShape(16.dp)),
                         contentAlignment = Alignment.Center,
                     ) {
                         Box(
@@ -241,7 +241,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 8.dp)
+                                    .padding(horizontal = 12.dp)
                             ) {
                                 Icon(
                                     modifier = Modifier.height(35.dp),
@@ -256,7 +256,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                                     Text(
                                         text = movie.rating.toString(),
                                         color = Color(0xFFFF8700),
-                                        fontSize = 12.5.sp,
+                                        fontSize = 16.sp,
                                         fontFamily = poppins,
                                         fontWeight = FontWeight.SemiBold
                                     )
@@ -276,7 +276,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
             ) {
                 AsyncImage(
                     modifier = Modifier
-                        .height(200.dp)
+                        .height(140.dp)
                         .width(120.dp),
                     model = imageUrl,
                     contentDescription = state.value.movieDetails?.title,

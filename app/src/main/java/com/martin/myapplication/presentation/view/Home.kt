@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -27,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -127,8 +130,9 @@ fun ShowImage(movieItem: MovieModel.Result, placement: Int, onClick: (Int) -> Un
         modifier = Modifier
             .padding(top = 24.dp)
             .padding(start = 12.dp)
-            .size(height = 210.dp, width = 144.61.dp)
-            .clickable { onClick(movieItem.id) },
+            .width(width = 144.61.dp)
+            .clickable { onClick(movieItem.id) }
+            .clip(RoundedCornerShape(20.dp)),
         model = imageUrl,
         contentDescription = movieItem.title,
     )
@@ -208,8 +212,8 @@ fun MovieCategories(
     }
 
     LazyVerticalGrid(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        columns = GridCells.Adaptive(minSize = 110.dp),
+        horizontalArrangement = Arrangement.spacedBy(13.dp),
+        columns = GridCells.Adaptive(minSize = 90.dp),
         modifier = Modifier.padding(end = 24.dp)
     ) {
         itemsIndexed(state) { id, movie ->
@@ -218,8 +222,9 @@ fun MovieCategories(
             AsyncImage(
                 modifier = Modifier
                     .padding(top = 24.dp)
-                    .size(height = 160.dp, width = 110.dp)
-                    .clickable { onClick(movie.id) },
+                    .width(80.dp)
+                    .clickable { onClick(movie.id) }
+                    .clip(RoundedCornerShape(20.dp)),
                 model = imageUrl,
                 contentDescription = movie.title,
             )
