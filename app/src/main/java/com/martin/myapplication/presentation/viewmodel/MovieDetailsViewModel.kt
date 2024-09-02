@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.martin.myapplication.data.remote.api.MoviesApi
+import com.martin.myapplication.data.remote.api.WatchlistRequest
 import com.martin.myapplication.data.repository.MoviesRepository
 import com.martin.myapplication.domain.usecase.AddMovieToWatchlistUseCase
 import com.martin.myapplication.domain.usecase.GetMovieDetailsUseCase
@@ -31,7 +32,7 @@ class MovieDetailsViewModel @Inject constructor(
     private val _isAdded = MutableStateFlow(false)
     val isAdded: StateFlow<Boolean> = _isAdded
 
-    fun addMovie(id: Int, watchlistRequest: MoviesApi.WatchlistRequest) {
+    fun addMovie(id: Int, watchlistRequest: WatchlistRequest) {
         viewModelScope.launch {
             addMovieToWatchlist(id, watchlistRequest).collect { result ->
                 when (result) {
@@ -63,7 +64,7 @@ class MovieDetailsViewModel @Inject constructor(
 
                         is ApiResult.Failure -> uiState.copy(
                             movieDetails = null,
-                            error = ""
+                            error = "An error has occurred"
                         )
                     }
                 }

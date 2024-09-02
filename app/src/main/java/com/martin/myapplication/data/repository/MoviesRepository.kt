@@ -1,12 +1,14 @@
 package com.martin.myapplication.data.repository
 
 import com.martin.myapplication.data.remote.api.MoviesApi
+import com.martin.myapplication.data.remote.api.WatchlistRequest
 import com.martin.myapplication.data.remote.dto.AddToWatchlistResponse
 import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
 import com.martin.myapplication.data.remote.dto.SearchMovieDTO
+import com.martin.myapplication.data.remote.dto.WatchListMoviesDTO
 import com.martin.myapplication.presentation.view.Movie
 import com.slack.eithernet.ApiResult
 import javax.inject.Inject
@@ -134,13 +136,31 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
 
     suspend fun addMoviesToWatchlist(
         id: Int,
-        watchlistRequest: MoviesApi.WatchlistRequest,
+        watchlistRequest: WatchlistRequest,
     ): ApiResult<AddToWatchlistResponse, MoviesError> {
         val result = moviesApi.addMovieToWatchList(id, watchlistRequest)
 
         when (result) {
             is ApiResult.Success -> {
                 println("Movie added to watchlist successfully: ${result.value}")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error adding movie to watchlist")
+            }
+        }
+
+        return result
+    }
+
+    suspend fun getMoviesFromWatchlist(
+        id: Int,
+    ): ApiResult<WatchListMoviesDTO, MoviesError> {
+        val result = moviesApi.getWatchListMovies(id)
+
+        when (result) {
+            is ApiResult.Success -> {
+                println("Watch List Movies: ${result.value}")
             }
 
             is ApiResult.Failure -> {

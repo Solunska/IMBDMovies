@@ -1,15 +1,19 @@
 package com.martin.myapplication.presentation.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -19,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,21 +35,34 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.domain.model.WatchListMoviesModel
 import com.martin.myapplication.presentation.ui.theme.poppins
+import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
+import com.martin.myapplication.presentation.viewmodel.WatchListViewModel
 
 @Composable
-fun SavedMoviesPage(goBack: () -> Unit,) {
-    SavedMovies(goBack)
+fun SavedMoviesPage(goBack: () -> Unit) {
+    val watchListViewModel: WatchListViewModel = hiltViewModel()
+    val watchListState = watchListViewModel.state.collectAsState()
+    val watchListMovies = watchListState.value.movies
+
+    LaunchedEffect(21456817) {
+        watchListViewModel.fetchMoviesFromWatchList(21456817)
+    }
+
+    SavedMovies(goBack, watchListMovies)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavedMovies(goBack: () -> Unit) {
+fun SavedMovies(goBack: () -> Unit, watchListMovies: List<WatchListMoviesModel.Result>) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val hasMoviesInWatchList by remember {
         mutableStateOf(true)
@@ -87,7 +106,7 @@ fun SavedMovies(goBack: () -> Unit) {
                 .fillMaxWidth()
         ) {
             if (hasMoviesInWatchList)
-                SavedContent()
+                SavedContent(watchListMovies)
             else
                 EmptyWatchList()
         }
@@ -95,17 +114,103 @@ fun SavedMovies(goBack: () -> Unit) {
 }
 
 @Composable
-fun SavedContent() {
+fun SavedContent(watchListMovies: List<WatchListMoviesModel.Result>) {
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 24.dp, vertical = 12.dp)
             .fillMaxSize()
     ) {
-//        items(movies) { movie ->
-//            MovieCard(movieItem = movie)
-//        }
+        itemsIndexed(watchListMovies) { id, movie ->
+            SavedMovieCard(movieItem = movie)
+        }
     }
 }
+
+
+@Composable
+fun SavedMovieCard(movieItem: WatchListMoviesModel.Result) {
+    val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
+    val state = movieDetailsViewModel.state.collectAsState()
+    val imageUrl = IMAGE_BASE_URL + movieItem.posterPath
+
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+    ) {
+        if (movieItem.posterPath.isNullOrEmpty()) {
+            Log.d("MovieCard", "Poster path is null")
+            Image(
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(106.dp),
+                painter = painterResource(id = R.drawable.poster_placeholder),
+                contentDescription = "no poster image",
+
+                )
+        } else {
+            Log.d("MovieCard", "Poster Path: ${movieItem.posterPath}")
+            AsyncImage(
+                modifier = Modifier
+                    .height(150.dp)
+                    .width(106.dp),
+                model = imageUrl,
+                contentDescription = movieItem.title,
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .height(150.dp)
+                .padding(start = 12.dp, top = 4.dp)
+                .fillMaxSize(),
+        ) {
+            Text(
+                text = movieItem.title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.White,
+                fontFamily = poppins
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 4.dp),
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                IconWithText(
+                    modifier = Modifier,
+                    icon = R.drawable.star,
+                    text = 9.5.toString(),
+                    details = false
+                )
+                state.value.movieDetails?.genres?.get(movieItem.genreIds.get(1))?.name?.let {
+                    IconWithText(
+                        modifier = Modifier,
+                        icon = R.drawable.ticket,
+                        text = it,
+                        details = false
+
+                    )
+                }
+                IconWithText(
+                    modifier = Modifier,
+                    icon = R.drawable.calendarblank,
+                    text = movieItem.releaseDate,
+                    details = false
+
+                )
+                IconWithText(
+                    modifier = Modifier,
+                    icon = R.drawable.clock,
+                    text = "120 minutes",
+                    details = false
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun EmptyWatchList() {

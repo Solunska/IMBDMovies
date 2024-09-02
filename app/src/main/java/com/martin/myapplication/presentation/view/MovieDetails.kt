@@ -59,6 +59,7 @@ import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
 import com.martin.myapplication.data.remote.api.MoviesApi
+import com.martin.myapplication.data.remote.api.WatchlistRequest
 import com.martin.myapplication.presentation.state.DetailsUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
@@ -150,7 +151,7 @@ fun Details(
 
     val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    val watchlistRequest = MoviesApi.WatchlistRequest(
+    val watchlistRequest = WatchlistRequest(
         media_type = "movie",
         media_id = id,
         watchlist = true
