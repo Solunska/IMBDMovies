@@ -1,12 +1,15 @@
 package com.martin.myapplication.data.remote.api
 
+import com.martin.myapplication.data.remote.dto.AddToWatchlistResponse
 import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
 import com.martin.myapplication.data.remote.dto.MoviesError
 import com.martin.myapplication.data.remote.dto.SearchMovieDTO
 import com.slack.eithernet.ApiResult
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -56,4 +59,16 @@ interface MoviesApi {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
     ): ApiResult<SearchMovieDTO, MoviesError>
+
+    data class WatchlistRequest(
+        val media_type: String,
+        val media_id: Int,
+        val watchlist: Boolean
+    )
+
+    @POST("account/{account_id}/watchlist")
+    suspend fun addMovieToWatchList(
+        @Path("account_id") id: Int = 21456817,
+        @Body watchlistRequest: WatchlistRequest
+    ): ApiResult<AddToWatchlistResponse, MoviesError>
 }

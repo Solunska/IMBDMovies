@@ -58,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.data.remote.api.MoviesApi
 import com.martin.myapplication.presentation.state.DetailsUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
@@ -66,12 +67,13 @@ import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
 fun MovieDetailsPage(goBack: () -> Unit, id: Int) {
     val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
     val movieDetailsState = movieDetailsViewModel.state.collectAsState()
+    val isAdded by movieDetailsViewModel.isAdded.collectAsState()
 
     LaunchedEffect(id) {
         movieDetailsViewModel.fetchMovieDetails(id)
     }
 
-    Details(goBack, movieDetailsState)
+    Details(goBack, movieDetailsState, id, movieDetailsViewModel,isAdded)
 }
 
 class Movie(
@@ -137,8 +139,22 @@ val colorStops = arrayOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Details(goBack: () -> Unit, state: State<DetailsUiState>) {
+fun Details(
+    goBack: () -> Unit,
+    state: State<DetailsUiState>,
+    id: Int,
+    movieDetailsViewModel: MovieDetailsViewModel,
+    isAdded: Boolean,
+) {
+
+
     val scrollBehaviour = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    val watchlistRequest = MoviesApi.WatchlistRequest(
+        media_type = "movie",
+        media_id = id,
+        watchlist = true
+    )
 
     Scaffold(
         backgroundColor = Color(0xFF242A32),
@@ -164,12 +180,13 @@ fun Details(goBack: () -> Unit, state: State<DetailsUiState>) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        movieDetailsViewModel.addMovie(21456817, watchlistRequest)
+                    }) {
                         Icon(
-                            painter = painterResource(R.drawable.save),
+                            painter = painterResource(if (isAdded) R.drawable.saved else R.drawable.save),
                             contentDescription = "save a movie",
-
-                            )
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -194,7 +211,6 @@ fun Details(goBack: () -> Unit, state: State<DetailsUiState>) {
 @Composable
 fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValues) {
 
-
     val imageUrl = IMAGE_BASE_URL + state.value.movieDetails?.posterPath
 
     var activeTab by remember {
@@ -202,8 +218,11 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
     }
 
     if (state.value.isLoading) {
-        Box(contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = Color(0xFF0296E5))
         }
     } else {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -276,8 +295,8 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
             ) {
                 AsyncImage(
                     modifier = Modifier
-                        .height(140.dp)
-                        .width(120.dp),
+                        .width(120.dp)
+                        .clip(RoundedCornerShape(20.dp)),
                     model = imageUrl,
                     contentDescription = state.value.movieDetails?.title,
                 )
@@ -507,7 +526,7 @@ fun ReviewsContent(name: String, rating: Double, review: String, avatar: String)
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontFamily = poppins,
-                fontSize = 12.sp
+                fontSize = 14.sp
             )
             Text(
                 text = review,

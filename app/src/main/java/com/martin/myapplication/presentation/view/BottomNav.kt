@@ -2,8 +2,6 @@ package com.martin.myapplication.presentation.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -30,7 +28,7 @@ import com.martin.myapplication.R
 sealed class BottomNavItem(val route: String, val icon: Int, val label: String) {
     object Home : BottomNavItem("home", R.drawable.home, "Home")
     object Search : BottomNavItem("search", R.drawable.search, "Search")
-    object Saved : BottomNavItem("saved", R.drawable.saved, "Profile")
+    object Saved : BottomNavItem("saved", R.drawable.watch_list, "Profile")
 }
 
 val items: List<BottomNavItem> = listOf(

@@ -1,6 +1,7 @@
 package com.martin.myapplication.data.repository
 
 import com.martin.myapplication.data.remote.api.MoviesApi
+import com.martin.myapplication.data.remote.dto.AddToWatchlistResponse
 import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
@@ -79,6 +80,8 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
     }
 
     suspend fun getMovieDetails(id: Int): ApiResult<MovieDetailsDTO, MoviesError> {
+
+
         val result = moviesApi.getMovieDetails(id)
 
         when (result) {
@@ -123,6 +126,25 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
 
             is ApiResult.Failure -> {
                 println("Error fetching movie results")
+            }
+        }
+
+        return result
+    }
+
+    suspend fun addMoviesToWatchlist(
+        id: Int,
+        watchlistRequest: MoviesApi.WatchlistRequest,
+    ): ApiResult<AddToWatchlistResponse, MoviesError> {
+        val result = moviesApi.addMovieToWatchList(id, watchlistRequest)
+
+        when (result) {
+            is ApiResult.Success -> {
+                println("Movie added to watchlist successfully: ${result.value}")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error adding movie to watchlist")
             }
         }
 
