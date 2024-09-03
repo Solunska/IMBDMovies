@@ -144,12 +144,13 @@ fun OutlinedText(placement: String) {
     Box(modifier = Modifier.absoluteOffset(x = (-150).dp, y = 150.dp)) {
         Text(
             text = placement,
-            style = fill,
+            style = outline,
         )
         Text(
             text = placement,
-            style = outline,
+            style = fill,
         )
+
     }
 }
 
