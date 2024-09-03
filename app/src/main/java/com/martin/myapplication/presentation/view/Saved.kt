@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -41,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.data.remote.dto.Genre
 import com.martin.myapplication.domain.model.WatchListMoviesModel
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
@@ -51,18 +54,24 @@ fun SavedMoviesPage(goBack: () -> Unit) {
     val watchListViewModel: WatchListViewModel = hiltViewModel()
     val watchListState = watchListViewModel.state.collectAsState()
     val watchListMovies = watchListState.value.movies
+    val genres = watchListState.value.genres
 
     LaunchedEffect(21456817) {
         watchListViewModel.fetchMoviesFromWatchList(21456817)
     }
 
-    SavedMovies(goBack, watchListMovies)
+    SavedMovies(goBack, watchListMovies, genres, watchListViewModel)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavedMovies(goBack: () -> Unit, watchListMovies: List<WatchListMoviesModel.Result>) {
+fun SavedMovies(
+    goBack: () -> Unit,
+    watchListMovies: List<WatchListMoviesModel.Result>,
+    genres: List<Genre>,
+    watchListViewModel: WatchListViewModel,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val hasMoviesInWatchList by remember {
         mutableStateOf(true)
@@ -106,7 +115,7 @@ fun SavedMovies(goBack: () -> Unit, watchListMovies: List<WatchListMoviesModel.R
                 .fillMaxWidth()
         ) {
             if (hasMoviesInWatchList)
-                SavedContent(watchListMovies)
+                SavedContent(watchListMovies, genres, watchListViewModel)
             else
                 EmptyWatchList()
         }
@@ -114,31 +123,41 @@ fun SavedMovies(goBack: () -> Unit, watchListMovies: List<WatchListMoviesModel.R
 }
 
 @Composable
-fun SavedContent(watchListMovies: List<WatchListMoviesModel.Result>) {
+fun SavedContent(
+    watchListMovies: List<WatchListMoviesModel.Result>,
+    genres: List<Genre>,
+    watchListViewModel: WatchListViewModel,
+) {
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 24.dp, vertical = 12.dp)
             .fillMaxSize()
     ) {
         itemsIndexed(watchListMovies) { id, movie ->
-            SavedMovieCard(movieItem = movie)
+            SavedMovieCard(movieItem = movie, genres, watchListViewModel)
         }
     }
 }
 
 
 @Composable
-fun SavedMovieCard(movieItem: WatchListMoviesModel.Result) {
+fun SavedMovieCard(
+    movieItem: WatchListMoviesModel.Result,
+    genres: List<Genre>,
+    watchListViewModel: WatchListViewModel,
+) {
     val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
     val state = movieDetailsViewModel.state.collectAsState()
     val imageUrl = IMAGE_BASE_URL + movieItem.posterPath
+
+    val genreName = watchListViewModel.getGenreNameById(movieItem.genreIds, genres)
 
     Row(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxSize()
     ) {
-        if (movieItem.posterPath.isNullOrEmpty()) {
+        if (movieItem.posterPath.isEmpty()) {
             Log.d("MovieCard", "Poster path is null")
             Image(
                 modifier = Modifier
@@ -152,8 +171,8 @@ fun SavedMovieCard(movieItem: WatchListMoviesModel.Result) {
             Log.d("MovieCard", "Poster Path: ${movieItem.posterPath}")
             AsyncImage(
                 modifier = Modifier
-                    .height(150.dp)
-                    .width(106.dp),
+                    .width(106.dp)
+                    .clip(RoundedCornerShape(20.dp)),
                 model = imageUrl,
                 contentDescription = movieItem.title,
             )
@@ -184,19 +203,17 @@ fun SavedMovieCard(movieItem: WatchListMoviesModel.Result) {
                     text = 9.5.toString(),
                     details = false
                 )
-                state.value.movieDetails?.genres?.get(movieItem.genreIds.get(1))?.name?.let {
-                    IconWithText(
-                        modifier = Modifier,
-                        icon = R.drawable.ticket,
-                        text = it,
-                        details = false
+                IconWithText(
+                    modifier = Modifier,
+                    icon = R.drawable.ticket,
+                    text = genreName,
+                    details = false
 
-                    )
-                }
+                )
                 IconWithText(
                     modifier = Modifier,
                     icon = R.drawable.calendarblank,
-                    text = movieItem.releaseDate,
+                    text = movieItem.releaseDate.take(4),
                     details = false
 
                 )

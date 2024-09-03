@@ -1,6 +1,8 @@
 package com.martin.myapplication.data.remote.api
 
 import com.martin.myapplication.data.remote.dto.AddToWatchlistResponse
+import com.martin.myapplication.data.remote.dto.Genre
+import com.martin.myapplication.data.remote.dto.GenresResponse
 import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
@@ -79,4 +81,9 @@ interface MoviesApi {
         @Query("language") language: String = "en-US",
         @Query("page") page: Int = 1,
     ): ApiResult<WatchListMoviesDTO, MoviesError>
+
+    @GET("genre/movie/list")
+    suspend fun getGenres(
+        @Query("language") language: String = "en-US"
+    ): ApiResult<GenresResponse, MoviesError>
 }

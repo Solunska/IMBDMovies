@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.CircularProgressIndicator
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.IconButton
@@ -32,17 +33,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,12 +49,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
+import com.martin.myapplication.data.remote.dto.Genre
 import com.martin.myapplication.domain.model.SearchMovieModel
 import com.martin.myapplication.presentation.state.SearchUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
 import com.martin.myapplication.presentation.viewmodel.SearchViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun SearchPage(goBack: () -> Unit) {
@@ -66,29 +63,10 @@ fun SearchPage(goBack: () -> Unit) {
     val searchState = searchViewModel.state.collectAsState()
     val searchInput = searchViewModel.searchText.collectAsState()
     val isSearching = searchViewModel.isSearching.collectAsState()
+    val genres = searchState.value.genres
 
-    SearchResults(goBack, searchViewModel, searchState, searchInput, isSearching)
+    SearchResults(goBack, searchViewModel, searchState, searchInput, isSearching, genres)
 }
-
-sealed class ColItem(
-    val photo: Int,
-    val name: String,
-    val rating: Double,
-    val genre: String,
-    val year: Int,
-    val duration: Int,
-) {
-    data object Movie1 : ColItem(R.drawable.movie_1, "name", 9.5, "genre", 2020, 120)
-    data object Movie2 : ColItem(R.drawable.movie_1, "name", 9.5, "genre", 2020, 120)
-    data object Movie3 : ColItem(R.drawable.movie_1, "name", 9.5, "genre", 2020, 120)
-
-}
-
-var movies: MutableList<ColItem> = mutableListOf(
-    ColItem.Movie1,
-    ColItem.Movie2,
-    ColItem.Movie3,
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,11 +76,9 @@ fun SearchResults(
     searchState: State<SearchUiState>,
     searchInput: State<String>,
     isSearching: State<Boolean>,
+    genres: List<Genre>,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val hasResults by remember {
-        mutableStateOf(true)
-    }
 
     Scaffold(
         backgroundColor = Color(0xFF242A32),
@@ -149,7 +125,7 @@ fun SearchResults(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            SearchBar(innerPadding, searchInput, searchViewModel, searchState)
+            SearchBar(innerPadding, searchInput, searchViewModel)
 
             if (isSearching.value && searchInput.value != "") {
                 CircularProgressIndicator(
@@ -161,7 +137,7 @@ fun SearchResults(
             } else if (searchState.value.movies.isEmpty() && searchInput.value != "" && !isSearching.value) {
                 NoResultsPage()
             } else {
-                SearchContent(searchState.value.movies)
+                SearchContent(searchState.value.movies, genres, searchViewModel)
             }
         }
     }
@@ -172,7 +148,6 @@ fun SearchBar(
     innerPadding: PaddingValues,
     searchInput: State<String>,
     searchViewModel: SearchViewModel,
-    searchState: State<SearchUiState>,
 ) {
     TextField(
         modifier = Modifier
@@ -221,23 +196,32 @@ fun SearchBar(
 }
 
 @Composable
-fun SearchContent(movie: List<SearchMovieModel.Result>) {
+fun SearchContent(
+    movie: List<SearchMovieModel.Result>,
+    genres: List<Genre>,
+    searchViewModel: SearchViewModel,
+) {
+
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 24.dp, vertical = 12.dp)
             .fillMaxSize()
     ) {
         itemsIndexed(movie) { id, movie ->
-            MovieCard(movie)
+            MovieCard(movie, genres, searchViewModel)
         }
     }
 }
 
 @Composable
-fun MovieCard(movieItem: SearchMovieModel.Result) {
-    val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
-    val state = movieDetailsViewModel.state.collectAsState()
+fun MovieCard(
+    movieItem: SearchMovieModel.Result,
+    genres: List<Genre>,
+    searchViewModel: SearchViewModel,
+) {
     val imageUrl = IMAGE_BASE_URL + movieItem.posterPath
+
+    val genreName = searchViewModel.getGenreNameById(movieItem.genreIds, genres)
 
     Row(
         modifier = Modifier
@@ -248,18 +232,17 @@ fun MovieCard(movieItem: SearchMovieModel.Result) {
             Log.d("MovieCard", "Poster path is null")
             Image(
                 modifier = Modifier
-                    .height(150.dp)
                     .width(106.dp),
                 painter = painterResource(id = R.drawable.poster_placeholder),
                 contentDescription = "no poster image",
 
-            )
+                )
         } else {
             Log.d("MovieCard", "Poster Path: ${movieItem.posterPath}")
             AsyncImage(
                 modifier = Modifier
-                    .height(150.dp)
-                    .width(106.dp),
+                    .height(160.dp)
+                    .clip(RoundedCornerShape(20.dp)),
                 model = imageUrl,
                 contentDescription = movieItem.originalTitle,
             )
@@ -267,7 +250,7 @@ fun MovieCard(movieItem: SearchMovieModel.Result) {
 
         Column(
             modifier = Modifier
-                .height(150.dp)
+                .height(160.dp)
                 .padding(start = 12.dp, top = 4.dp)
                 .fillMaxSize(),
         ) {
@@ -290,19 +273,18 @@ fun MovieCard(movieItem: SearchMovieModel.Result) {
                     text = 9.5.toString(),
                     details = false
                 )
-                state.value.movieDetails?.genres?.get(movieItem.genreIds.get(1))?.name?.let {
-                    IconWithText(
-                        modifier = Modifier,
-                        icon = R.drawable.ticket,
-                        text = it,
-                        details = false
+                IconWithText(
+                    modifier = Modifier,
+                    icon = R.drawable.ticket,
+                    text = genreName,
+                    details = false
 
-                    )
-                }
+                )
+
                 IconWithText(
                     modifier = Modifier,
                     icon = R.drawable.calendarblank,
-                    text = movieItem.releaseDate,
+                    text = movieItem.releaseDate.take(4),
                     details = false
 
                 )
@@ -386,9 +368,3 @@ fun NoResultsPage() {
         )
     }
 }
-
-//@Preview
-//@Composable
-//fun SearchPreview() {
-//    SearchPage()
-//}

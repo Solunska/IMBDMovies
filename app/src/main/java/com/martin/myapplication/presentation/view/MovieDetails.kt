@@ -326,7 +326,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                     IconWithText(
                         modifier = Modifier,
                         icon = R.drawable.calendarblank,
-                        text = state.value.movieDetails?.releaseDate.toString(),
+                        text = state.value.movieDetails?.releaseDate.toString().take(4),
                         details = true
                     )
                     Box(

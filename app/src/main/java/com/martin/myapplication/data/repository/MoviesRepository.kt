@@ -3,6 +3,8 @@ package com.martin.myapplication.data.repository
 import com.martin.myapplication.data.remote.api.MoviesApi
 import com.martin.myapplication.data.remote.api.WatchlistRequest
 import com.martin.myapplication.data.remote.dto.AddToWatchlistResponse
+import com.martin.myapplication.data.remote.dto.Genre
+import com.martin.myapplication.data.remote.dto.GenresResponse
 import com.martin.myapplication.data.remote.dto.MovieDTO
 import com.martin.myapplication.data.remote.dto.MovieDetailsDTO
 import com.martin.myapplication.data.remote.dto.MovieReviewsDTO
@@ -153,9 +155,7 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
         return result
     }
 
-    suspend fun getMoviesFromWatchlist(
-        id: Int,
-    ): ApiResult<WatchListMoviesDTO, MoviesError> {
+    suspend fun getMoviesFromWatchlist(id: Int): ApiResult<WatchListMoviesDTO, MoviesError> {
         val result = moviesApi.getWatchListMovies(id)
 
         when (result) {
@@ -171,4 +171,19 @@ class MoviesRepository @Inject constructor(private val moviesApi: MoviesApi) {
         return result
     }
 
+    suspend fun getGenres(): ApiResult<GenresResponse, MoviesError> {
+        val result = moviesApi.getGenres()
+
+        when (result) {
+            is ApiResult.Success -> {
+                println("Genres: ${result.value.genres}")
+            }
+
+            is ApiResult.Failure -> {
+                println("Error fetching genres")
+            }
+        }
+
+        return result
+    }
 }
