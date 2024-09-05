@@ -33,6 +33,7 @@ fun WatchListMoviesDTO.toMovieModel(): WatchListMoviesModel {
     return WatchListMoviesModel(
         results = this.results.map { result ->
             WatchListMoviesModel.Result(
+                id = result.id,
                 posterPath = result.posterPath,
                 releaseDate = result.releaseDate,
                 genreIds = result.genreIds,

@@ -56,6 +56,8 @@ fun SavedMoviesPage(goBack: () -> Unit) {
     val watchListMovies = watchListState.value.movies
     val genres = watchListState.value.genres
 
+    println("Watch List movies $watchListMovies")
+
     LaunchedEffect(21456817) {
         watchListViewModel.fetchMoviesFromWatchList(21456817)
     }

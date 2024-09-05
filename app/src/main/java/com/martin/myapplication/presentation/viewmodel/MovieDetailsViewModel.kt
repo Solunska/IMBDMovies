@@ -29,9 +29,6 @@ class MovieDetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow(DetailsUiState())
     val state: StateFlow<DetailsUiState> = _state
 
-    private val _isAdded = MutableStateFlow(false)
-    val isAdded: StateFlow<Boolean> = _isAdded
-
     fun addMovie(id: Int, watchlistRequest: WatchlistRequest) {
         viewModelScope.launch {
             addMovieToWatchlist(id, watchlistRequest).collect { result ->

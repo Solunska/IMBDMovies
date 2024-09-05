@@ -58,41 +58,32 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.martin.myapplication.BuildConfig.IMAGE_BASE_URL
 import com.martin.myapplication.R
-import com.martin.myapplication.data.remote.api.MoviesApi
 import com.martin.myapplication.data.remote.api.WatchlistRequest
+import com.martin.myapplication.domain.model.WatchListMoviesModel
 import com.martin.myapplication.presentation.state.DetailsUiState
 import com.martin.myapplication.presentation.ui.theme.poppins
 import com.martin.myapplication.presentation.viewmodel.MovieDetailsViewModel
+import com.martin.myapplication.presentation.viewmodel.WatchListViewModel
 
 @Composable
 fun MovieDetailsPage(goBack: () -> Unit, id: Int) {
     val movieDetailsViewModel: MovieDetailsViewModel = hiltViewModel()
     val movieDetailsState = movieDetailsViewModel.state.collectAsState()
-    val isAdded by movieDetailsViewModel.isAdded.collectAsState()
+    val watchListViewModel: WatchListViewModel = hiltViewModel()
 
     LaunchedEffect(id) {
         movieDetailsViewModel.fetchMovieDetails(id)
     }
 
-    Details(goBack, movieDetailsState, id, movieDetailsViewModel,isAdded)
+    LaunchedEffect(21456817) {
+        watchListViewModel.fetchMoviesFromWatchList(21456817)
+    }
+
+    Details(goBack, movieDetailsState, id, movieDetailsViewModel, watchListViewModel)
 }
 
 class Movie(
-    val photo: Int,
-    val name: String,
-    val rating: Double,
-    val year: Int,
-    val duration: Int,
-    val genre: String,
-    val description: String,
-    val reviews: MutableList<Review>,
     val cast: MutableList<Cast>,
-)
-
-class Review(
-    val name: String,
-    val reviewContent: String,
-    val reviewStars: Double,
 )
 
 class Cast(
@@ -101,30 +92,6 @@ class Cast(
 )
 
 var movie = Movie(
-    R.drawable.movie_2,
-    "Spiderman No Way Home",
-    9.5,
-    2021,
-    148,
-    "Action",
-    "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.",
-    reviews = mutableListOf(
-        Review(
-            "Iqbal Shafiq Rozaan",
-            "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government.",
-            6.3
-        ),
-        Review(
-            "Iqbal Shafiq Rozaan",
-            "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government.",
-            6.3
-        ),
-        Review(
-            "Iqbal Shafiq Rozaan",
-            "From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government.",
-            6.3
-        )
-    ),
     cast = mutableListOf(
         Cast("Tom Holland", R.drawable.tom_holand),
         Cast("Tom Holland", R.drawable.tom_holand),
@@ -145,7 +112,7 @@ fun Details(
     state: State<DetailsUiState>,
     id: Int,
     movieDetailsViewModel: MovieDetailsViewModel,
-    isAdded: Boolean,
+    watchListViewModel: WatchListViewModel,
 ) {
 
 
@@ -183,9 +150,17 @@ fun Details(
                 actions = {
                     IconButton(onClick = {
                         movieDetailsViewModel.addMovie(21456817, watchlistRequest)
+
                     }) {
+                        val watchListMovies = watchListViewModel.state.collectAsState().value.movies
+                        println("Watch List movies $watchListMovies")
                         Icon(
-                            painter = painterResource(if (isAdded) R.drawable.saved else R.drawable.save),
+                            painter = painterResource(
+                                if (watchListMovies.any { it.id == id })
+                                    R.drawable.saved
+                                else
+                                    R.drawable.save
+                            ),
                             contentDescription = "save a movie",
                         )
                     }
@@ -274,7 +249,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = movie.rating.toString(),
+                                        text = "9.5",
                                         color = Color(0xFFFF8700),
                                         fontSize = 16.sp,
                                         fontFamily = poppins,
@@ -338,7 +313,7 @@ fun MovieDetailsContent(state: State<DetailsUiState>, innerPadding: PaddingValue
                     IconWithText(
                         modifier = Modifier.height(20.dp),
                         icon = R.drawable.clock,
-                        text = movie.duration.toString(),
+                        text = "120",
                         details = true
                     )
                     Box(

@@ -8,6 +8,7 @@ data class WatchListMoviesModel (
     val results: List<Result>,
 ){
     data class Result(
+        val id: Int,
         val genreIds: List<Int>,
         val posterPath: String,
         val releaseDate: String,
